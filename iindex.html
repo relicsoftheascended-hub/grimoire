@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grimoire Pro — Relics of the Ascended</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --parchment:#f5edd6;--parchment-dark:#e8d9b5;--parchment-deep:#d4c090;
+  --ink:#1a1209;--ink-faded:#4a3c28;--ink-light:#7a6a50;
+  --blood:#8b1a1a;--gold:#c8960c;--gold-light:#e8b84b;
+}
+body{background:#120d06;background-image:radial-gradient(ellipse at 20% 20%,#2a1f0e 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,#0f0a04 0%,transparent 60%);min-height:100vh;font-family:'Crimson Pro',Georgia,serif;color:var(--ink)}
+.page-border{position:fixed;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#8b1a1a,#c8960c,#8b1a1a,#c8960c,#8b1a1a);z-index:200}
+.container{max-width:980px;margin:0 auto;padding:2rem 1.25rem 5rem}
+/* Header */
+.site-header{text-align:center;padding:2.5rem 0 1.5rem}
+.site-header::after{content:'';display:block;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin-top:1.25rem}
+.site-title{font-family:'Cinzel',serif;font-size:clamp(1.8rem,6vw,3rem);font-weight:700;color:var(--gold-light);letter-spacing:.12em;text-shadow:0 2px 20px rgba(200,150,12,.4)}
+.site-subtitle{font-style:italic;color:#8a7355;font-size:.95rem;margin-top:.35rem;letter-spacing:.05em}
+/* Tabs */
+.tabs{display:flex;margin-bottom:1.25rem;border-radius:4px;overflow:hidden;border:1px solid #3a2a12}
+.tab{flex:1;font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.65rem .4rem;cursor:pointer;background:#1e1508;color:#7a6540;border:none;border-right:1px solid #3a2a12;transition:all .2s;text-align:center;line-height:1.3}
+.tab:last-child{border-right:none}
+.tab:hover{background:#2a1c0a;color:var(--gold-light)}
+.tab.active{background:var(--parchment);color:var(--blood);font-weight:700}
+.tab-icon{display:block;font-size:1rem;margin-bottom:2px}
+/* Cards */
+.card{background:var(--parchment);border-radius:3px;box-shadow:0 6px 40px rgba(0,0,0,.55);border:1px solid var(--parchment-deep);margin-bottom:1.25rem;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blood),var(--gold),var(--blood))}
+.card-inner{padding:1.5rem 1.75rem}
+@media(max-width:600px){.card-inner{padding:1.1rem}}
+.slabel{font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--blood);margin-bottom:.75rem;display:flex;align-items:center;gap:.6rem}
+.slabel::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--parchment-deep),transparent)}
+/* Fields */
+.config-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem}
+@media(max-width:640px){.config-grid{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faded);margin-bottom:.3rem}
+.field input,.field select{width:100%;background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:2px;padding:.4rem .6rem;font-family:'Crimson Pro',serif;font-size:1rem;color:var(--ink);outline:none;transition:border-color .2s;appearance:none}
+.field input:focus,.field select:focus{border-color:var(--gold)}
+/* Buttons */
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap}
+.btn{font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border:none;border-radius:2px;padding:.6rem 1.3rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-primary{background:var(--blood);color:var(--parchment);box-shadow:0 2px 12px rgba(139,26,26,.4)}
+.btn-primary:hover{background:#a01f1f;transform:translateY(-1px)}
+.btn-primary:active{transform:none}
+.btn-ghost{background:transparent;color:var(--ink-faded);border:1px solid var(--parchment-deep)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--ink)}
+.btn-sm{padding:.35rem .8rem;font-size:.6rem}
+
+/* ── EVENT RESULT CARD ── */
+.event-type-banner{display:flex;align-items:center;gap:.75rem;margin-bottom:1.1rem;padding:.65rem 1rem;border-radius:3px}
+.event-icon{font-size:1.8rem;line-height:1}
+.event-type-name{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;letter-spacing:.08em}
+.event-type-sub{font-size:.85rem;font-style:italic;opacity:.85;margin-top:1px}
+.ev-combat{background:#3a0e0e;color:#f0a0a0;border:1px solid #7a2a2a}
+.ev-encounter{background:#1a2e3a;color:#a0d0f0;border:1px solid #2a5a7a}
+.ev-nature{background:#1a2e1a;color:#a0d4a0;border:1px solid #2a5a2a}
+.ev-mystic{background:#2a1a3a;color:#c0a0f0;border:1px solid #5a2a7a}
+.ev-nothing{background:#2a2a1a;color:#c0b870;border:1px solid #5a5020}
+
+/* Compact result */
+.result-headline{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;line-height:1.2}
+.result-hook{font-size:1rem;color:var(--ink-faded);font-style:italic;line-height:1.6;margin-bottom:.85rem}
+.result-pills{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.85rem}
+.rpill{font-size:.82rem;background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:2px;padding:.2rem .7rem}
+.rpill strong{font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--blood);display:block}
+
+/* Expandable detail */
+.detail-toggle{display:flex;align-items:center;gap:.5rem;font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--blood);cursor:pointer;user-select:none;padding:.4rem 0;border-top:1px solid var(--parchment-deep);margin-top:.5rem}
+.detail-toggle:hover{color:var(--ink)}
+.detail-toggle .arrow{transition:transform .2s;font-style:normal}
+.detail-toggle.open .arrow{transform:rotate(90deg)}
+.detail-body{display:none;padding-top:.85rem;border-top:1px solid var(--parchment-deep);margin-top:.5rem}
+.detail-body.open{display:block}
+
+/* Stat block inside detail */
+.stat-bar{background:var(--blood);color:var(--parchment);padding:.4rem 1rem;font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin:.75rem -1.75rem}
+@media(max-width:600px){.stat-bar{margin:.75rem -1.1rem}}
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);text-align:center;border-bottom:1px solid var(--parchment-deep);padding-bottom:.5rem;margin-bottom:.5rem;gap:2px}
+@media(max-width:420px){.stats-row{grid-template-columns:repeat(3,1fr)}}
+.stat-col .sa{font-family:'Cinzel',serif;font-size:.55rem;font-weight:600;letter-spacing:.1em;color:var(--blood);display:block}
+.stat-col .sn{font-size:1.05rem;font-weight:500}
+.stat-col .sm{font-size:.75rem;color:var(--ink-faded)}
+.trait-block{margin-bottom:.5rem;font-size:.92rem;line-height:1.5}
+.trait-block .tn{font-weight:500;font-style:italic}
+.trait-block .tn::after{content:'.'}
+.divider-orn{text-align:center;color:var(--gold);font-size:.9rem;margin:.6rem 0;letter-spacing:.5em}
+
+/* Monster tabs */
+.monster-tabs{display:flex;border-bottom:2px solid var(--parchment-deep);margin-bottom:.85rem;overflow-x:auto}
+.mtab{font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.45rem .9rem;cursor:pointer;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--ink-faded);transition:all .15s;white-space:nowrap;margin-bottom:-2px}
+.mtab:hover{color:var(--ink)}
+.mtab.active{border-bottom-color:var(--blood);color:var(--blood)}
+.mtab .mc{display:inline-block;background:var(--parchment-deep);border-radius:10px;font-size:.48rem;padding:1px 5px;margin-left:3px;vertical-align:middle}
+.mtab.active .mc{background:var(--blood);color:var(--parchment)}
+
+/* Conditions */
+.cond-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem}
+.chip{display:flex;align-items:center;gap:5px;border:1px solid var(--parchment-deep);border-radius:2px;padding:.25rem .75rem;font-size:.85rem;cursor:pointer;background:var(--parchment-dark);transition:all .15s;user-select:none}
+.chip:hover{border-color:var(--gold)}
+.chip.active{background:var(--ink);color:var(--parchment);border-color:var(--ink)}
+.chip .pip{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.chip .auto-tag{font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:.05em;background:var(--gold);color:var(--ink);padding:1px 4px;border-radius:1px;text-transform:uppercase;margin-left:2px}
+.chip.active .auto-tag{background:var(--gold-light)}
+.eff-list{list-style:none}
+.eff-list li{padding:.28rem 0;border-bottom:1px solid var(--parchment-deep);font-size:.88rem;display:flex;align-items:baseline;gap:.5rem}
+.eff-list li:last-child{border-bottom:none}
+.eff-cat{font-family:'Cinzel',serif;font-size:.55rem;font-weight:600;letter-spacing:.1em;color:var(--blood);text-transform:uppercase;flex-shrink:0;min-width:68px}
+
+/* Relic */
+.relic-card{background:linear-gradient(135deg,#2a1c08,#1a1005);border:1px solid var(--gold);border-radius:3px;padding:.85rem 1rem;margin-top:.75rem}
+.relic-name{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;color:var(--gold-light);margin-bottom:2px}
+.relic-type{font-size:.78rem;color:#a08040;font-style:italic;margin-bottom:.5rem}
+.relic-desc{font-size:.9rem;color:#d4b870;line-height:1.6}
+.relic-rarity{display:inline-block;font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:2px;margin-bottom:.5rem}
+.rarity-common{background:#3a3a2a;color:#c0c080}
+.rarity-uncommon{background:#1a3a2a;color:#80d0a0}
+.rarity-rare{background:#1a2a4a;color:#80a0f0}
+.rarity-very-rare{background:#2a1a4a;color:#c080f0}
+.rarity-legendary{background:#3a1a0a;color:#f0a040}
+
+/* RotA Bestiary */
+.rota-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.75rem}
+.rota-card{background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:3px;padding:.8rem .95rem;cursor:pointer;transition:all .2s;position:relative}
+.rota-card:hover{border-color:var(--gold)}
+.rota-card.expanded{border-color:var(--blood)}
+.rota-card-name{font-family:'Cinzel',serif;font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:1px}
+.rota-card-meta{font-size:.78rem;color:var(--ink-faded);font-style:italic;margin-bottom:.35rem}
+.rota-tags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:.4rem}
+.rota-tag{font-family:'Cinzel',serif;font-size:.46rem;letter-spacing:.06em;text-transform:uppercase;background:var(--blood);color:var(--parchment);padding:1px 5px;border-radius:2px}
+.rota-loc-tag{background:#1a4a2a;color:#80d0a0}
+.rota-pills{display:flex;gap:.35rem;flex-wrap:wrap}
+.rota-pill{font-size:.75rem;background:var(--parchment);border:1px solid var(--parchment-deep);border-radius:2px;padding:1px 6px}
+.rota-detail{margin-top:.75rem;border-top:1px solid var(--parchment-deep);padding-top:.75rem;display:none}
+.rota-card.expanded .rota-detail{display:block}
+.expand-hint{position:absolute;top:.6rem;right:.7rem;font-size:.6rem;color:var(--ink-light);font-style:italic}
+
+/* NPC encounter */
+.npc-block{background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:2px;padding:.75rem 1rem;margin-bottom:.6rem}
+.npc-name{font-family:'Cinzel',serif;font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:2px}
+.npc-role{font-size:.8rem;font-style:italic;color:var(--ink-faded);margin-bottom:.5rem}
+.npc-section{font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blood);margin:.5rem 0 .2rem}
+.npc-item{font-size:.88rem;color:var(--ink);padding:.15rem 0;padding-left:.75rem;position:relative}
+.npc-item::before{content:"—";position:absolute;left:0;color:var(--ink-light)}
+
+/* Nature/Mystic event */
+.event-body{font-size:.95rem;line-height:1.7;color:var(--ink);margin-bottom:.75rem}
+.event-consequence{background:var(--parchment-dark);border-left:3px solid var(--gold);padding:.5rem .85rem;font-size:.88rem;font-style:italic;color:var(--ink-faded);margin-top:.5rem}
+
+/* Location selector */
+.loc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem;margin-bottom:1rem}
+.loc-btn{font-family:'Cinzel',serif;font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.55rem .5rem;border:1px solid var(--parchment-deep);border-radius:2px;background:var(--parchment-dark);color:var(--ink-faded);cursor:pointer;transition:all .15s;text-align:center}
+.loc-btn:hover{border-color:var(--gold);color:var(--ink)}
+.loc-btn.active{background:var(--blood);color:var(--parchment);border-color:var(--blood)}
+.loc-type{display:block;font-size:.48rem;opacity:.7;margin-top:1px;font-weight:400;letter-spacing:.05em}
+
+/* XP bar */
+.xp-track{height:6px;background:var(--parchment-deep);border-radius:2px;overflow:hidden;margin:.35rem 0 .2rem}
+.xp-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.xp-labels{display:flex;justify-content:space-between;font-size:.6rem;color:var(--ink-light);font-family:'Cinzel',serif;letter-spacing:.04em}
+.diff-badge{font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .75rem;border-radius:2px;white-space:nowrap}
+.d-easy{background:#1e4011;color:#7ed957}.d-medium{background:#3d4a0d;color:#cde850}.d-hard{background:#4a2e0a;color:#e8a050}.d-deadly{background:#4a0e0e;color:#e86060}
+.lore-text{font-style:italic;font-size:.92rem;color:var(--ink-faded);line-height:1.65;border-left:3px solid var(--gold);padding-left:.85rem;margin:.75rem 0}
+
+/* Auto banner */
+.auto-banner{background:#2a1c0a;border:1px solid #5a3a10;border-radius:2px;padding:.45rem .75rem;font-size:.82rem;color:#d4a050;margin-bottom:.65rem;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+
+/* API */
+.api-key-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem}
+.api-note{font-size:.78rem;color:var(--ink-faded);font-style:italic}
+.loading-overlay{display:flex;align-items:center;justify-content:center;gap:.6rem;padding:1.5rem;font-style:italic;color:var(--ink-faded)}
+.spinner{width:18px;height:18px;border:2px solid var(--parchment-deep);border-top-color:var(--blood);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.anim{animation:fadeUp .3s ease both}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="page-border"></div>
+<div class="container">
+
+<header class="site-header">
+  <div class="site-title">⚔ Grimoire Pro ⚔</div>
+  <div class="site-subtitle">Relics of the Ascended — Living World Event Generator</div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="setTab('generator')" id="tab-generator"><span class="tab-icon">⚔</span>Event Generator</button>
+  <button class="tab" onclick="setTab('bestiary')" id="tab-bestiary"><span class="tab-icon">📖</span>RotA Bestiary</button>
+  <button class="tab" onclick="setTab('relics')" id="tab-relics"><span class="tab-icon">💎</span>Relics</button>
+  <button class="tab" onclick="setTab('ai')" id="tab-ai"><span class="tab-icon">✨</span>RotA + AI</button>
+</div>
+
+<!-- ══════════ GENERATOR TAB ══════════ -->
+<div id="panel-generator">
+
+  <div class="card anim">
+    <div class="card-inner">
+      <div class="slabel">Location</div>
+      <div class="loc-grid" id="loc-grid"></div>
+
+      <div class="slabel">Party</div>
+      <div class="config-grid">
+        <div class="field"><label>Party Size</label><input type="number" id="party-size" value="4" min="1" max="10"></div>
+        <div class="field"><label>Avg Level</label><input type="number" id="party-level" value="5" min="1" max="20"></div>
+        <div class="field"><label>Difficulty</label>
+          <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+            <option value="deadly">Deadly</option>
+          </select>
+        </div>
+        <div class="field"><label>Monster Source</label>
+          <select id="monster-source">
+            <option value="rota">RotA Only</option>
+            <option value="random" selected>Random</option>
+            <option value="hybrid">RotA + AI</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="rollEvent()">⚄ Roll Event</button>
+        <button class="btn btn-ghost hidden" id="reroll-btn" onclick="rollEvent()">↺ Reroll</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI KEY (shown when AI source selected) -->
+  <div class="card anim hidden" id="ai-key-card">
+    <div class="card-inner">
+      <div class="slabel">Anthropic API Key</div>
+      <div class="api-key-row">
+        <div class="field" style="flex:1;margin:0"><input type="password" id="api-key" placeholder="sk-ant-…"></div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleKey()">Show</button>
+      </div>
+      <p class="api-note">Only stored in this tab. Get one free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--gold)">console.anthropic.com</a></p>
+    </div>
+  </div>
+
+  <!-- EVENT OUTPUT -->
+  <div id="event-output" class="hidden">
+    <div class="card anim" id="event-card">
+      <div class="card-inner">
+        <div id="loading-ai" class="loading-overlay hidden"><div class="spinner"></div><span>The AI is conjuring something from the abyss…</span></div>
+        <div id="event-content"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panel-generator -->
+
+<!-- ══════════ BESTIARY TAB ══════════ -->
+<div id="panel-bestiary" class="hidden">
+  <div class="card anim">
+    <div class="card-inner">
+      <div class="slabel">RotA Bestiary</div>
+      <div class="rota-grid" id="rota-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ RELICS TAB ══════════ -->
+<div id="panel-relics" class="hidden">
+  <div class="card anim">
+    <div class="card-inner">
+      <div class="slabel">Relics of the Ascended</div>
+      <div id="relics-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ AI TAB ══════════ -->
+<div id="panel-ai" class="hidden">
+  <div class="card anim">
+    <div class="card-inner">
+      <div class="slabel">RotA + AI Monster Generator</div>
+      <div class="config-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="field"><label>Party Size</label><input type="number" id="ai-party-size" value="4" min="1" max="10"></div>
+        <div class="field"><label>Avg Level</label><input type="number" id="ai-party-level" value="5" min="1" max="20"></div>
+        <div class="field"><label>Difficulty</label>
+          <select id="ai-difficulty">
+            <option value="easy">Easy</option><option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option><option value="deadly">Deadly</option>
+          </select>
+        </div>
+      </div>
+      <div class="slabel" style="margin-top:.5rem">Anthropic API Key</div>
+      <div class="api-key-row">
+        <div class="field" style="flex:1;margin:0"><input type="password" id="api-key-ai" placeholder="sk-ant-…"></div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleKey2()">Show</button>
+      </div>
+      <div class="btn-row" style="margin-top:.5rem">
+        <button class="btn btn-primary" onclick="generateAIEncounter()">✨ Generate AI Encounter</button>
+      </div>
+      <div id="ai-output" style="margin-top:1rem"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  WORLD DATA — Edit these to build your world!
+// ══════════════════════════════════════════════════════════════
+
+const LOCATIONS = [
+  {
+    id: "harkenwald",
+    name: "Harkenwald",
+    type: "Village",
+    region: "The Verdant Reach",
+    desc: "A small, struggling village on the edge of the Ashwood. Its people are superstitious and wary of strangers.",
+    monsterTags: ["forest", "undead", "humanoid"],
+    eventWeights: { nothing:5, combat:40, encounter:35, nature:12, mystic:8 },
+    rumors: [
+      "A farmer swears he saw lights in the Ashwood three nights running — no torches, just cold blue fire.",
+      "The miller's son went missing last week. The village elder blames wolves, but the boy's dog came back alone and won't stop howling.",
+      "A traveling merchant offered twice the going rate for owl feathers. Nobody knows why.",
+      "Old Marta claims the well water tastes different since the last new moon.",
+    ],
+    encounters: [
+      { name:"Traveling Merchant", role:"Peddler of curiosities", goods:["Rope (50ft) — 1gp","Healing Salve (1d4 HP) — 5gp","Old Map (unverified) — 3gp"], quests:["Find out what happened to his missing cart horse, last seen near the Ashwood."], rumors:["He heard soldiers of the Iron Compact were seen two days east of here."] },
+      { name:"Refugee Family", role:"Fleeing something they won't name", goods:[], quests:["Escort them safely to the next town.","Find out what they are fleeing from."], rumors:["Their village burned three nights ago. They say it wasn't bandits."] },
+      { name:"Wandering Hedge Witch", role:"Herbalist & fortune-teller", goods:["Antitoxin — 10gp","Nightbloom Tea (advantage on WIS saves, 1hr) — 15gp"], quests:["She needs a rare mushroom found only in the Ashwood."], rumors:["The stars have been wrong for a week. Something is pulling at the ley lines."] },
+    ],
+    natureEvents: [
+      { name:"Ashwood Fog", desc:"A dense, unnatural fog rolls in from the Ashwood, reducing visibility to 20 ft. and muffling all sound. Animals refuse to move through it.", consequence:"Navigation checks DC 14. Creatures with darkvision treat it as dim light." },
+      { name:"Sudden Storm", desc:"Dark clouds gather in minutes. Thunder shakes the earth and rain falls in sheets. The road becomes mud, and the river threatens to flood.", consequence:"Travel speed halved. Ranged attacks have disadvantage. Fires are extinguished." },
+      { name:"Crow Omen", desc:"Hundreds of crows land in the village square and sit in perfect silence for one hour before vanishing together.", consequence:"The villagers refuse to speak about it. One old man weeps quietly." },
+    ],
+    mysticEvents: [
+      { name:"Whisper in the Well", desc:"The village well speaks in a dead language. Anyone who leans close hears their own name spoken in a voice they recognize — someone who has died.", consequence:"DC 13 WIS save or frightened for 1 hour. On success, gain one cryptic vision of the future." },
+      { name:"The Pale Traveler", desc:"A figure in white passes through the village at dusk, leaving no footprints. No one can describe their face afterward.", consequence:"All undead within 1 mile become aware of the party's location for 24 hours." },
+    ],
+  },
+
+  // ── PLACEHOLDER LOCATIONS ── Add your real locations below this line ──
+  {
+    id: "ashwood",
+    name: "The Ashwood",
+    type: "Forest",
+    region: "The Verdant Reach",
+    desc: "A grey, ancient forest where the trees grow too straight and the birds fall silent. [Placeholder — add details]",
+    monsterTags: ["forest", "undead", "fey"],
+    eventWeights: { nothing:3, combat:50, encounter:20, nature:15, mystic:12 },
+    rumors: ["Placeholder rumor — fill this in.","Placeholder rumor — fill this in."],
+    encounters: [{ name:"Lost Scout", role:"Placeholder NPC", goods:[], quests:["Placeholder quest."], rumors:["Placeholder rumor."] }],
+    natureEvents: [{ name:"Placeholder Nature Event", desc:"Describe what happens here.", consequence:"Describe the mechanical effect." }],
+    mysticEvents: [{ name:"Placeholder Mystic Event", desc:"Describe the strange occurrence.", consequence:"Describe the effect on the party." }],
+  },
+  {
+    id: "iron-road",
+    name: "The Iron Road",
+    type: "Trade Road",
+    region: "Central Reaches",
+    desc: "The main trade artery between the great cities. Busy, dangerous, and full of opportunity. [Placeholder]",
+    monsterTags: ["humanoid", "beast"],
+    eventWeights: { nothing:5, combat:35, encounter:45, nature:10, mystic:5 },
+    rumors: ["Placeholder rumor.","Placeholder rumor."],
+    encounters: [{ name:"Merchant Caravan", role:"Placeholder NPC", goods:["Placeholder item — Xgp"], quests:["Placeholder quest."], rumors:["Placeholder rumor."] }],
+    natureEvents: [{ name:"Placeholder Nature Event", desc:"Describe what happens.", consequence:"Describe the effect." }],
+    mysticEvents: [{ name:"Placeholder Mystic Event", desc:"Describe the occurrence.", consequence:"Describe the effect." }],
+  },
+  {
+    id: "sunken-citadel",
+    name: "The Sunken Citadel",
+    type: "Dungeon",
+    region: "The Ashwood",
+    desc: "A fortress that sank into the earth centuries ago. Only the upper spires remain visible above ground. [Placeholder]",
+    monsterTags: ["undead", "construct", "rota"],
+    eventWeights: { nothing:2, combat:60, encounter:10, nature:8, mystic:20 },
+    rumors: ["Placeholder rumor.","Placeholder rumor."],
+    encounters: [{ name:"Surviving Adventurer", role:"Placeholder NPC", goods:[], quests:["Placeholder quest."], rumors:["Placeholder rumor."] }],
+    natureEvents: [{ name:"Placeholder Nature Event", desc:"Describe what happens.", consequence:"Describe the effect." }],
+    mysticEvents: [{ name:"Placeholder Mystic Event", desc:"Describe the occurrence.", consequence:"Describe the effect." }],
+  },
+  {
+    id: "verdant-plains",
+    name: "Verdant Plains",
+    type: "Region",
+    region: "Central Reaches",
+    desc: "Rolling grasslands that stretch for days in every direction. Beautiful, exposed, and full of roaming beasts. [Placeholder]",
+    monsterTags: ["beast", "humanoid"],
+    eventWeights: { nothing:8, combat:38, encounter:32, nature:15, mystic:7 },
+    rumors: ["Placeholder rumor.","Placeholder rumor."],
+    encounters: [{ name:"Nomadic Herder", role:"Placeholder NPC", goods:["Placeholder item — Xgp"], quests:["Placeholder quest."], rumors:["Placeholder rumor."] }],
+    natureEvents: [{ name:"Placeholder Nature Event", desc:"Describe what happens.", consequence:"Describe the effect." }],
+    mysticEvents: [{ name:"Placeholder Mystic Event", desc:"Describe the occurrence.", consequence:"Describe the effect." }],
+  },
+];
+
+// ── ROTA MONSTERS ──────────────────────────────────────────────
+const ROTA_MONSTERS = [
+  {
+    name: "Ashen Revenant",
+    type: "Medium undead",
+    align: "neutral evil",
+    env: "ruined temples of the Ascended",
+    cr: 4, hp: 78, ac: 14, speed: 30,
+    stats: [16,12,14,10,12,8],
+    tags: ["undead","rota"],
+    locationTags: ["harkenwald","sunken-citadel","ashwood"],
+    traits: [
+      {name:"Undead Fortitude", desc:"If damage reduces it to 0 HP, DC (5+damage) Con. save — on success drops to 1 HP instead, unless radiant or critical."},
+      {name:"Ash Step", desc:"Leaves a trail of cinders when it moves. Creatures entering the space take 1d4 fire damage."},
+    ],
+    actions: [
+      {name:"Cinder Claw", desc:"Melee +5, reach 5 ft. Hit: 2d6+3 slashing + 1d6 fire."},
+      {name:"Ashen Shroud", desc:"Recharge 5–6. 15 ft. radius, DC 13 Con. or blinded until end of next turn."},
+    ],
+    lore: "Soldiers who fell defending the Ascended's temples rise again, their flesh replaced with cinders and will.",
+    senses: "darkvision 60 ft., passive Perception 11",
+    immune: "fire, poison; poisoned condition",
+    lang: "understands languages it knew in life but cannot speak",
+    relicId: "ashen-brand",
+  },
+  // ── ADD MORE ROTA MONSTERS BELOW ──
+  // {
+  //   name: "Your Monster",
+  //   type: "Large fiend",
+  //   cr: 7, hp: 120, ac: 16, speed: 40,
+  //   stats: [20,14,18,12,10,8],
+  //   tags: ["fiend","rota"],
+  //   locationTags: ["sunken-citadel"],
+  //   traits: [{name:"Trait Name", desc:"Trait description."}],
+  //   actions: [{name:"Action Name", desc:"Action description."}],
+  //   lore: "Lore text.",
+  //   relicId: null,  // or "relic-id" if this monster can drop a relic
+  // },
+];
+
+// ── RELICS ─────────────────────────────────────────────────────
+const RELICS = [
+  {
+    id: "ashen-brand",
+    name: "The Ashen Brand",
+    type: "Wondrous Item, requires attunement",
+    rarity: "rare",
+    source: "Dropped by the Ashen Revenant",
+    desc: "A blackened iron brand in the shape of a rising flame. While attuned, you are immune to fire damage from undead sources, and your melee attacks deal an additional 1d6 fire damage against undead. Once per day, you can use an action to release a 15 ft. cone of ash — creatures must succeed on a DC 14 Constitution saving throw or be blinded until the end of their next turn.",
+    lore: "Forged in the final fires of the Ascended's fall, these brands were carried by their most devoted soldiers. The fire never goes out.",
+  },
+  // ── ADD MORE RELICS BELOW ──
+  {
+    id: "placeholder-relic-1",
+    name: "Placeholder Relic",
+    type: "Wondrous Item",
+    rarity: "uncommon",
+    source: "Found in [Location]",
+    desc: "Describe what this item does mechanically.",
+    lore: "Describe the lore and history of this item.",
+  },
+  {
+    id: "placeholder-relic-2",
+    name: "Another Placeholder Relic",
+    type: "Weapon, requires attunement",
+    rarity: "very-rare",
+    source: "Dropped by [Monster]",
+    desc: "Describe what this item does mechanically.",
+    lore: "Describe the lore and history of this item.",
+  },
+];
+
+// ── RANDOM ENCOUNTER TABLES (for non-RotA combat) ──────────────
+const RANDOM_PREFIXES=["Grave","Ash","Void","Fang","Iron","Tide","Storm","Ember","Blight","Frost","Shadow","Bone","Plague","Rot","Night","Cinder","Dread","Rune","Hex","Grim","Mire","Silt","Rust","Dusk","Vex"];
+const RANDOM_CORES=["Stalker","Crawler","Wraith","Hulk","Reaper","Walker","Weaver","Lurker","Drake","Render","Shade","Specter","Brute","Horror","Ravager","Slayer","Haunt","Warden","Fiend","Lurcher"];
+const RANDOM_SUFFS=["","","","","of Chaos","the Undying","Prime","Ancient","of the Deep","Reborn","the Cursed"];
+const RAND_TYPES=["aberration","beast","construct","dragon","elemental","fey","fiend","giant","humanoid","monstrosity","ooze","plant","undead"];
+const RAND_SIZES=["Tiny","Small","Medium","Large","Huge","Gargantuan"];
+const RAND_ALIGNS=["chaotic evil","neutral evil","lawful evil","chaotic neutral","true neutral","unaligned"];
+const RAND_ENVS=["deep forest","volcanic caverns","sunken ruins","the Shadowfell","a haunted swamp","arctic tundra","desert tombs","an abandoned fortress"];
+const TRAITS_P=[
+  {name:"Regeneration",desc:"Regains 10 HP at the start of its turn if it has at least 1 HP."},
+  {name:"Pack Tactics",desc:"Advantage on attack rolls while an ally is adjacent to the target."},
+  {name:"Magic Resistance",desc:"Advantage on saving throws against spells and magical effects."},
+  {name:"Keen Senses",desc:"Advantage on Perception checks relying on sight and smell."},
+  {name:"Frightful Presence",desc:"Creatures within 30 ft. must succeed DC 13 WIS save or be frightened for 1 minute."},
+  {name:"Legendary Resistance (1/Day)",desc:"If the creature fails a saving throw, it can choose to succeed instead."},
+  {name:"Arcane Absorption",desc:"When subjected to magical damage, regains HP equal to half the damage dealt."},
+  {name:"Spider Climb",desc:"Can climb difficult surfaces including ceilings without an ability check."},
+  {name:"Death Burst",desc:"On death, 10 ft. radius — DC 13 DEX save or 3d6 necrotic."},
+  {name:"Amphibious",desc:"Can breathe both air and water."},
+];
+const ACTIONS_P=[
+  {name:"Crushing Claw",desc:"Melee +6, reach 5 ft. Hit: 2d8+4 bludgeoning."},
+  {name:"Necrotic Breath",desc:"Recharge 5–6. 30 ft. cone, DC 14 CON — 4d8 necrotic (half on save)."},
+  {name:"Venom Bite",desc:"Melee +5. Hit: 1d10+3 piercing + 2d6 poison, DC 13 CON or poisoned 1 min."},
+  {name:"Mind Spike",desc:"Ranged spell +7, 60 ft. Hit: 3d6 psychic; DC 15 WIS or stunned 1 turn."},
+  {name:"Tail Sweep",desc:"DC 14 DEX save for all in 10 ft. — 2d6+3 bludgeoning and knocked prone."},
+  {name:"Void Tendrils",desc:"Recharge 6. 3 targets, 60 ft. DC 13 DEX or restrained and 1d8 necrotic/turn."},
+  {name:"Shadow Step",desc:"Teleport 60 ft. to dim light or darkness, then melee attack with advantage."},
+  {name:"Soul Drain",desc:"Melee or ranged +6, 30 ft. Hit: 3d6 necrotic; target HP max reduced until long rest."},
+  {name:"Glacial Bolt",desc:"Ranged +5, 90 ft. Hit: 2d10+3 cold; target speed −10 ft. until next turn."},
+  {name:"Spore Cloud",desc:"Recharge 5–6. 15 ft. radius, DC 12 CON or poisoned 1 minute."},
+];
+const SENSES_P=["darkvision 60 ft.","darkvision 120 ft.","tremorsense 30 ft.","blindsight 30 ft.","darkvision 60 ft., tremorsense 10 ft."];
+const IMMUNE_P=["poison, psychic","fire, cold","bludgeoning from nonmagical attacks","necrotic, poison","charmed, frightened"];
+const LANG_P=["Abyssal","Deep Speech, telepathy 60 ft.","Sylvan, Elvish","Infernal, Common","understands Common but cannot speak","—"];
+
+// D&D XP tables
+const XP_THRESH={1:[25,50,75,100],2:[50,100,150,200],3:[75,150,225,400],4:[125,250,375,500],5:[250,500,750,1100],6:[300,600,900,1400],7:[350,750,1100,1700],8:[450,900,1400,2100],9:[550,1100,1600,2400],10:[600,1200,1900,2800],11:[800,1600,2400,3600],12:[1000,2000,3000,4500],13:[1100,2200,3400,5100],14:[1250,2500,3800,5700],15:[1400,2800,4300,6400],16:[1600,3200,4800,7200],17:[2000,3900,5900,8800],18:[2100,4200,6300,9500],19:[2400,4900,7300,10900],20:[2800,5700,8500,12700]};
+const CR_XP={0:10,.125:25,.25:50,.5:100,1:200,2:450,3:700,4:1100,5:1800,6:2300,7:2900,8:3900,9:5000,10:5900,11:7200,12:8400,13:10000,14:11500,15:13000,16:15000,17:18000,18:20000,19:22000,20:25000,21:33000,22:41000};
+const CRS=Object.keys(CR_XP).map(Number);
+const ENC_MULT=[[1,1],[2,1.5],[3,2],[7,2.5],[11,3],[15,4]];
+const SA=["STR","DEX","CON","INT","WIS","CHA"];
+const mod=v=>{const m=Math.floor((v-10)/2);return(m>=0?"+":"")+m};
+const rng=a=>a[Math.floor(Math.random()*a.length)];
+const rngN=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const rollStat=()=>{let d=[rngN(1,6),rngN(1,6),rngN(1,6),rngN(1,6)].sort((a,b)=>b-a);d.pop();return d.reduce((a,b)=>a+b,0)};
+const fmtXP=n=>n.toLocaleString();
+function getMult(n){for(let i=ENC_MULT.length-1;i>=0;i--)if(n>=ENC_MULT[i][0])return ENC_MULT[i][1];return 1}
+function pickCR(level,diff){
+  const off={easy:-2,medium:0,hard:2,deadly:4};
+  const target=Math.max(0.125,level+off[diff]);
+  const valid=CRS.filter(c=>c>=0.125&&c<=target+2);
+  const close=valid.filter(c=>c>=Math.max(0.125,target-1)&&c<=target+1);
+  return close.length?rng(close):rng(valid);
+}
+function actualDiff(adjXP,thresholds,partySize){
+  const [e,m,h]=thresholds.map(t=>t*partySize);
+  if(adjXP<e)return'easy';if(adjXP<m)return'medium';if(adjXP<h)return'hard';return'deadly';
+}
+
+const VARIATIONS=[
+  {id:"broken-arm",label:"Broken Arm",color:"#c0392b",effects:[["Attack","−2 to all melee attack rolls"],["Multiattack","Loses one attack if using Multiattack"]]},
+  {id:"sick",label:"Sick",color:"#27ae60",effects:[["CON saves","−2 to CON saving throws"],["Speed","Speed reduced by 10 ft."]]},
+  {id:"stronger",label:"Stronger",color:"#2980b9",effects:[["STR","+4 to STR score"],["Damage","+2 to all melee damage"],["HP","Max HP +20"]]},
+  {id:"under-influence",label:"Under Influence",color:"#d68910",effects:[["Attacks","All attacks at disadvantage"],["Reactions","Cannot take reactions"]]},
+  {id:"enraged",label:"Enraged",color:"#922b21",effects:[["Attacks","Advantage on all melee attacks"],["Damage","+3 damage below half HP"]]},
+  {id:"ancient",label:"Ancient",color:"#6c3483",effects:[["Saves","+2 to all saving throws"],["Save DCs","All DCs +2"]]},
+  {id:"wounded",label:"Wounded",color:"#7f8c8d",effects:[["HP","Max HP −25%"],["Speed","Speed halved"]]},
+  {id:"cursed",label:"Cursed",color:"#4a235a",effects:[["DoT","1d4 necrotic at start of each turn"],["Healing","Cannot be magically healed until curse is lifted"]]},
+  {id:"berserk",label:"Berserk",color:"#784212",effects:[["AI","Must attack the nearest creature"],["Damage","+2 to all damage rolls"]]},
+  {id:"blessed",label:"Blessed",color:"#1a5276",effects:[["Bonus","+1d4 to attacks and saves"],["Regen","Regains 5 HP at turn start"]]},
+];
+
+// ══════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════
+let selectedLocation = LOCATIONS[0];
+let currentTab = 'generator';
+let activeVariation = null;
+let autoApplied = false;
+let activeMonsterIdx = 0;
+let currentEncounter = [];
+let detailOpen = false;
+
+// ══════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  renderLocationGrid();
+  renderBestiary();
+  renderRelicsList();
+  document.getElementById('monster-source').addEventListener('change', e => {
+    document.getElementById('ai-key-card').classList.toggle('hidden', e.target.value !== 'hybrid');
+  });
+});
+
+// ══════════════════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════════════════
+function setTab(t){
+  currentTab=t;
+  ['generator','bestiary','relics','ai'].forEach(id=>{
+    document.getElementById('tab-'+id).classList.toggle('active',id===t);
+    document.getElementById('panel-'+id).classList.toggle('hidden',id!==t);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOCATION GRID
+// ══════════════════════════════════════════════════════════════
+function renderLocationGrid(){
+  document.getElementById('loc-grid').innerHTML = LOCATIONS.map(loc=>`
+    <button class="loc-btn${loc.id===selectedLocation.id?' active':''}" onclick="selectLocation('${loc.id}')">
+      ${loc.name}<span class="loc-type">${loc.type}</span>
+    </button>`).join('');
+}
+function selectLocation(id){
+  selectedLocation=LOCATIONS.find(l=>l.id===id)||LOCATIONS[0];
+  renderLocationGrid();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  EVENT ROLLER
+// ══════════════════════════════════════════════════════════════
+function rollEvent(){
+  const loc = selectedLocation;
+  const w = loc.eventWeights;
+  const total = Object.values(w).reduce((a,b)=>a+b,0);
+  let roll = Math.random()*total;
+  let type = 'combat';
+  for(const [k,v] of Object.entries(w)){ roll-=v; if(roll<=0){type=k;break;} }
+
+  document.getElementById('event-output').classList.remove('hidden');
+  document.getElementById('reroll-btn').classList.remove('hidden');
+  detailOpen = false;
+
+  if(type==='nothing') renderNothingEvent(loc);
+  else if(type==='combat') renderCombatEvent(loc);
+  else if(type==='encounter') renderNPCEvent(loc);
+  else if(type==='nature') renderNatureEvent(loc);
+  else if(type==='mystic') renderMysticEvent(loc);
+
+  document.getElementById('event-output').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── NOTHING ──
+function renderNothingEvent(loc){
+  const msgs=[
+    "The road is quiet. Too quiet, perhaps — but nothing stirs.",
+    "A peaceful stretch. Birds sing, the wind is gentle, and the world seems briefly kind.",
+    "Nothing of note occurs. The party travels without incident.",
+    "The path ahead is clear. A welcome, if uneasy, calm.",
+  ];
+  document.getElementById('event-content').innerHTML=`
+    <div class="event-type-banner ev-nothing">
+      <span class="event-icon">🌿</span>
+      <div><div class="event-type-name">No Event</div><div class="event-type-sub">${loc.name} — ${loc.type}</div></div>
+    </div>
+    <div class="result-headline">The Road Is Clear</div>
+    <div class="result-hook">${rng(msgs)}</div>`;
+}
+
+// ── COMBAT ──
+function renderCombatEvent(loc){
+  const partySize=Math.max(1,parseInt(document.getElementById('party-size').value)||4);
+  const level=Math.min(20,Math.max(1,parseInt(document.getElementById('party-level').value)||5));
+  const diff=document.getElementById('difficulty').value;
+  const source=document.getElementById('monster-source').value;
+  const thresholds=XP_THRESH[level];
+
+  // Build encounter group
+  const budget=thresholds[["easy","medium","hard","deadly"].indexOf(diff)]*partySize;
+  const typeCount=rng([1,1,2,2,2,3,3]);
+  const mainCR=pickCR(level,diff);
+  const mainXP=CR_XP[mainCR]||200;
+  const slots=[{cr:mainCR,count:Math.max(1,Math.min(5,Math.round((budget*0.55)/(mainXP*getMult(typeCount)))))}];
+  let usedXP=mainXP*slots[0].count;
+  for(let i=1;i<typeCount&&usedXP<budget*1.2;i++){
+    const remaining=budget-usedXP;
+    if(remaining<50)break;
+    const mCR=rng(CRS.filter(c=>c<=mainCR&&c>=Math.max(0.125,mainCR*0.25)))||0.25;
+    const mXP=CR_XP[mCR]||50;
+    const mCount=Math.max(1,Math.min(5,Math.round(remaining/mXP)));
+    slots.push({cr:mCR,count:mCount});
+    usedXP+=mXP*mCount;
+  }
+
+  // Pick monsters
+  currentEncounter=[];
+  for(const slot of slots){
+    let m;
+    if(source==='rota'||source==='hybrid'){
+      const pool=ROTA_MONSTERS.filter(mon=>
+        (mon.locationTags||[]).includes(loc.id) ||
+        (mon.tags||[]).some(t=>loc.monsterTags.includes(t))
+      );
+      if(pool.length){
+        const sorted=pool.slice().sort((a,b)=>Math.abs(a.cr-slot.cr)-Math.abs(b.cr-slot.cr));
+        m=Object.assign({},sorted[0]);
+        m.senses=m.senses||rng(SENSES_P)+', passive Perception '+rngN(10,18);
+        m.immune=m.immune||rng(IMMUNE_P);m.lang=m.lang||rng(LANG_P);
+      }
+    }
+    if(!m) m=buildRandMonster(slot.cr);
+    m.count=slot.count;
+    m.monXP=CR_XP[slot.cr]||200;
+    currentEncounter.push(m);
+  }
+
+  const totalXP=currentEncounter.reduce((s,m)=>s+m.monXP*m.count,0);
+  const totalCount=currentEncounter.reduce((s,m)=>s+m.count,0);
+  const adjXP=Math.round(totalXP*getMult(totalCount));
+  const adiff=actualDiff(adjXP,thresholds,partySize);
+  const DIFF_COL={easy:'#27ae60',medium:'#c8a800',hard:'#e67e22',deadly:'#c0392b'};
+  const DIFF_CLS={easy:'d-easy',medium:'d-medium',hard:'d-hard',deadly:'d-deadly'};
+  const DIFF_LBL={easy:'Easy',medium:'Medium',hard:'Hard',deadly:'Deadly'};
+
+  // 30% condition
+  autoApplied=false;activeVariation=null;
+  if(Math.random()<0.3){activeVariation=rng(VARIATIONS).id;autoApplied=true;}
+
+  // Check for relic drop (if any monster has a relicId)
+  let relicHTML='';
+  for(const m of currentEncounter){
+    if(m.relicId&&Math.random()<0.25){
+      const rel=RELICS.find(r=>r.id===m.relicId);
+      if(rel) relicHTML=renderRelicDrop(rel);
+    }
+  }
+
+  const names=currentEncounter.map(m=>`${m.count>1?m.count+'× ':''}${m.name}`).join(' + ');
+  const hooks=[
+    `Emerging from the shadows, ${names} blocks the path ahead.`,
+    `Without warning, ${names} descends upon the party.`,
+    `A rustling in the undergrowth — too late to run. ${names} has already surrounded them.`,
+    `The air grows cold. ${names} steps into view, eyes fixed on the party.`,
+  ];
+
+  const [,,, d]=thresholds.map(t=>t*partySize);
+  const pct=Math.min(100,Math.round(adjXP/d*100));
+
+  activeMonsterIdx=0;
+  document.getElementById('event-content').innerHTML=`
+    <div class="event-type-banner ev-combat">
+      <span class="event-icon">⚔️</span>
+      <div><div class="event-type-name">Combat Encounter</div><div class="event-type-sub">${loc.name} — ${loc.type}</div></div>
+      <span class="diff-badge ${DIFF_CLS[adiff]}" style="margin-left:auto">${DIFF_LBL[adiff]}</span>
+    </div>
+    <div class="result-headline">${names}</div>
+    <div class="result-hook">${rng(hooks)}</div>
+    <div class="result-pills">
+      <div class="rpill"><strong>Monsters</strong>${totalCount}</div>
+      <div class="rpill"><strong>Types</strong>${currentEncounter.length}</div>
+      <div class="rpill"><strong>Adj XP</strong>${fmtXP(adjXP)}</div>
+      <div class="rpill"><strong>Raw XP</strong>${fmtXP(totalXP)}</div>
+    </div>
+    <div class="xp-track"><div class="xp-fill" style="width:${pct}%;background:${DIFF_COL[adiff]}"></div></div>
+    <div class="xp-labels"><span>Easy</span><span>Medium</span><span>Hard</span><span>Deadly</span></div>
+
+    ${autoApplied?`<div class="auto-banner" style="margin-top:.75rem">⚄ Condition auto-applied (30% chance): <strong>${VARIATIONS.find(v=>v.id===activeVariation)?.label}</strong></div>`:''}
+
+    <div class="detail-toggle" onclick="toggleDetail('combat-detail')" id="toggle-combat-detail">
+      <span class="arrow">▶</span> Stat Blocks & Conditions
+    </div>
+    <div class="detail-body" id="combat-detail">
+      ${currentEncounter.length>1?`<div class="monster-tabs" id="monster-tabs">${currentEncounter.map((m,i)=>`<button class="mtab${i===0?' active':''}" onclick="switchMonster(${i})">${m.name}${m.count>1?`<span class="mc">${m.count}×</span>`:''}</button>`).join('')}</div>`:''}
+      <div id="statblock-content">${buildStatBlockHTML(currentEncounter[0])}</div>
+
+      <div style="margin-top:1rem">
+        <div class="slabel">Conditions</div>
+        <div class="cond-chips">${VARIATIONS.map(v=>`
+          <div class="chip${activeVariation===v.id?' active':''}" onclick="toggleVar('${v.id}')">
+            <span class="pip" style="background:${v.color}"></span>${v.label}
+            ${activeVariation===v.id&&autoApplied?'<span class="auto-tag">auto</span>':''}
+          </div>`).join('')}</div>
+        <div id="effects-wrapper" style="display:${activeVariation?'block':'none'}">
+          <ul class="eff-list" id="effects-list">${activeVariation?renderEffectsHTML(activeVariation):''}</ul>
+        </div>
+      </div>
+    </div>
+    ${relicHTML}`;
+}
+
+function buildStatBlockHTML(m){
+  if(!m) return '';
+  const stats=m.stats||SA.map(()=>10);
+  return`<div style="display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin-bottom:.35rem">
+    <span style="font-family:'Cinzel',serif;font-size:1.05rem;font-weight:700">${m.name}</span>
+    ${m.count>1?`<span style="font-family:'Cinzel',serif;font-size:.65rem;color:var(--blood);text-transform:uppercase;letter-spacing:.08em">${m.count}× in encounter</span>`:''}
+    ${m.source==='ai'?'<span style="font-size:.72rem;color:var(--gold);font-style:italic">✦ AI</span>':''}
+  </div>
+  <p style="font-size:.82rem;font-style:italic;color:var(--ink-faded);margin-bottom:.65rem">${m.type||'?'}, ${m.align||'unaligned'} — CR ${m.cr}</p>
+  <div class="stats-row">${SA.map((s,j)=>`<div class="stat-col"><span class="sa">${s}</span><span class="sn">${stats[j]}</span><span class="sm">(${mod(stats[j])})</span></div>`).join('')}</div>
+  <p style="font-size:.88rem;margin-bottom:.6rem"><strong>AC</strong> ${m.ac} | <strong>HP</strong> ${m.hp} | <strong>Speed</strong> ${m.speed||30} ft.</p>
+  ${(m.traits||[]).map(t=>`<div class="trait-block"><span class="tn">${t.name}</span> ${t.desc}</div>`).join('')}
+  <div class="stat-bar">Actions</div>
+  <div style="margin-top:.5rem">${(m.actions||[]).map(a=>`<div class="trait-block"><span class="tn">${a.name}</span> ${a.desc}</div>`).join('')}</div>
+  <div class="divider-orn">⁕ ⁕ ⁕</div>
+  <p style="font-size:.82rem;color:var(--ink-faded)"><strong>Senses</strong> ${m.senses||'—'}<br><strong>Immunities</strong> ${m.immune||'—'}<br><strong>Languages</strong> ${m.lang||'—'}</p>
+  ${m.lore?`<div class="lore-text">${m.lore}</div>`:''}`;
+}
+
+function renderEffectsHTML(id){
+  const v=VARIATIONS.find(x=>x.id===id);
+  if(!v)return'';
+  return v.effects.map(([cat,eff])=>`<li><span class="eff-cat">${cat}</span>${eff}</li>`).join('');
+}
+
+function renderRelicDrop(rel){
+  const rarityClass='rarity-'+rel.rarity;
+  return`<div class="detail-toggle" onclick="toggleDetail('relic-detail')" id="toggle-relic-detail" style="margin-top:.5rem">
+    <span class="arrow">▶</span> 💎 Relic Found!
+  </div>
+  <div class="detail-body" id="relic-detail">
+    <div class="relic-card">
+      <span class="relic-rarity ${rarityClass}">${rel.rarity.replace('-',' ')}</span>
+      <div class="relic-name">${rel.name}</div>
+      <div class="relic-type">${rel.type}</div>
+      <div class="relic-desc">${rel.desc}</div>
+      ${rel.lore?`<div class="lore-text" style="margin-top:.6rem;color:#a08040;border-color:#806020">${rel.lore}</div>`:''}
+    </div>
+  </div>`;
+}
+
+// ── NPC ENCOUNTER ──
+function renderNPCEvent(loc){
+  const npc=rng(loc.encounters);
+  const rumor=rng(loc.rumors);
+  const hasGoods=npc.goods&&npc.goods.length;
+  const hasQuests=npc.quests&&npc.quests.length;
+  const hasNpcRumors=npc.rumors&&npc.rumors.length;
+  const hooks=[
+    `On the road ahead, ${npc.name} stands waiting — or perhaps simply resting.`,
+    `A figure by the roadside: ${npc.name}. They raise a hand in greeting.`,
+    `${npc.name} approaches from the direction of ${loc.name}.`,
+  ];
+  document.getElementById('event-content').innerHTML=`
+    <div class="event-type-banner ev-encounter">
+      <span class="event-icon">👥</span>
+      <div><div class="event-type-name">Encounter</div><div class="event-type-sub">${loc.name} — ${loc.type}</div></div>
+    </div>
+    <div class="result-headline">${npc.name}</div>
+    <div class="result-hook">${rng(hooks)}</div>
+    <div class="result-pills">
+      <div class="rpill"><strong>Role</strong>${npc.role}</div>
+      ${hasGoods?`<div class="rpill"><strong>Goods</strong>${npc.goods.length} items</div>`:''}
+      ${hasQuests?`<div class="rpill"><strong>Quests</strong>${npc.quests.length}</div>`:''}
+    </div>
+    <div class="detail-toggle" onclick="toggleDetail('npc-detail')" id="toggle-npc-detail">
+      <span class="arrow">▶</span> NPC Details, Rumors & Goods
+    </div>
+    <div class="detail-body" id="npc-detail">
+      <div class="npc-block">
+        <div class="npc-name">${npc.name}</div>
+        <div class="npc-role">${npc.role}</div>
+        ${hasNpcRumors?`<div class="npc-section">What they've heard</div>${npc.rumors.map(r=>`<div class="npc-item">${r}</div>`).join('')}`:''}
+        ${hasQuests?`<div class="npc-section">Possible quests</div>${npc.quests.map(q=>`<div class="npc-item">${q}</div>`).join('')}`:''}
+        ${hasGoods?`<div class="npc-section">Goods for sale</div>${npc.goods.map(g=>`<div class="npc-item">${g}</div>`).join('')}`:''}
+      </div>
+      <div class="npc-section" style="margin-top:.5rem">Rumor circulating in ${loc.name}</div>
+      <div class="event-consequence">${rumor}</div>
+    </div>`;
+}
+
+// ── NATURE ──
+function renderNatureEvent(loc){
+  const ev=rng(loc.natureEvents);
+  document.getElementById('event-content').innerHTML=`
+    <div class="event-type-banner ev-nature">
+      <span class="event-icon">🌩️</span>
+      <div><div class="event-type-name">Natural Event</div><div class="event-type-sub">${loc.name} — ${loc.type}</div></div>
+    </div>
+    <div class="result-headline">${ev.name}</div>
+    <div class="result-hook">${ev.desc}</div>
+    <div class="detail-toggle" onclick="toggleDetail('nature-detail')" id="toggle-nature-detail">
+      <span class="arrow">▶</span> Mechanical Effect
+    </div>
+    <div class="detail-body" id="nature-detail">
+      <div class="event-consequence">${ev.consequence}</div>
+    </div>`;
+}
+
+// ── MYSTIC ──
+function renderMysticEvent(loc){
+  const ev=rng(loc.mysticEvents);
+  document.getElementById('event-content').innerHTML=`
+    <div class="event-type-banner ev-mystic">
+      <span class="event-icon">🔮</span>
+      <div><div class="event-type-name">Mystic Event</div><div class="event-type-sub">${loc.name} — ${loc.type}</div></div>
+    </div>
+    <div class="result-headline">${ev.name}</div>
+    <div class="result-hook">${ev.desc}</div>
+    <div class="detail-toggle" onclick="toggleDetail('mystic-detail')" id="toggle-mystic-detail">
+      <span class="arrow">▶</span> Effect on the Party
+    </div>
+    <div class="detail-body" id="mystic-detail">
+      <div class="event-consequence">${ev.consequence}</div>
+    </div>`;
+}
+
+// ── TOGGLE DETAIL ──
+function toggleDetail(id){
+  const body=document.getElementById(id);
+  const toggle=document.getElementById('toggle-'+id);
+  if(!body||!toggle)return;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  toggle.classList.toggle('open',!isOpen);
+}
+
+// ── MONSTER SWITCHING ──
+function switchMonster(i){
+  activeMonsterIdx=i;
+  document.querySelectorAll('.mtab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+  document.getElementById('statblock-content').innerHTML=buildStatBlockHTML(currentEncounter[i]);
+}
+
+// ── CONDITIONS ──
+function toggleVar(id){
+  activeVariation=activeVariation===id?null:id;
+  autoApplied=false;
+  document.querySelectorAll('.chip').forEach(c=>{
+    const cid=c.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+    if(cid) c.classList.toggle('active',cid===activeVariation);
+  });
+  const wrap=document.getElementById('effects-wrapper');
+  const list=document.getElementById('effects-list');
+  if(wrap&&list){
+    wrap.style.display=activeVariation?'block':'none';
+    list.innerHTML=activeVariation?renderEffectsHTML(activeVariation):'';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  BESTIARY
+// ══════════════════════════════════════════════════════════════
+function renderBestiary(){
+  const grid=document.getElementById('rota-grid');
+  if(!ROTA_MONSTERS.length){grid.innerHTML='<p style="font-style:italic;color:var(--ink-faded)">No RotA monsters yet.</p>';return;}
+  grid.innerHTML=ROTA_MONSTERS.map((m,i)=>{
+    const stats=m.stats||[10,10,10,10,10,10];
+    const tags=(m.tags||[]).map(t=>`<span class="rota-tag">${t}</span>`).join('');
+    const locs=(m.locationTags||[]).map(t=>{const l=LOCATIONS.find(x=>x.id===t);return l?`<span class="rota-tag rota-loc-tag">${l.name}</span>`:''}).join('');
+    return`<div class="rota-card" id="rota-${i}" onclick="toggleRotaCard(${i})">
+      <span class="expand-hint">click to expand</span>
+      <div class="rota-card-name">${m.name}</div>
+      <div class="rota-card-meta">${m.type}${m.align?', '+m.align:''}</div>
+      <div class="rota-tags">${tags}${locs}</div>
+      <div class="rota-pills">
+        <span class="rota-pill"><strong style="font-family:'Cinzel',serif;font-size:.52rem;color:var(--blood)">CR</strong> ${m.cr}</span>
+        <span class="rota-pill"><strong style="font-family:'Cinzel',serif;font-size:.52rem;color:var(--blood)">HP</strong> ${m.hp}</span>
+        <span class="rota-pill"><strong style="font-family:'Cinzel',serif;font-size:.52rem;color:var(--blood)">AC</strong> ${m.ac}</span>
+      </div>
+      <div class="rota-detail">
+        <div class="stats-row">${SA.map((s,j)=>`<div class="stat-col"><span class="sa">${s}</span><span class="sn">${stats[j]}</span><span class="sm">(${mod(stats[j])})</span></div>`).join('')}</div>
+        ${m.lore?`<div class="lore-text" style="margin:.4rem 0 .6rem">${m.lore}</div>`:''}
+        ${(m.traits||[]).map(t=>`<div class="trait-block"><span class="tn">${t.name}</span> ${t.desc}</div>`).join('')}
+        ${m.actions?.length?`<div class="stat-bar" style="margin:.5rem -1rem .4rem">Actions</div>${(m.actions||[]).map(a=>`<div class="trait-block"><span class="tn">${a.name}</span> ${a.desc}</div>`).join('')}`:''}
+        ${m.senses?`<p style="font-size:.8rem;color:var(--ink-faded);margin-top:.5rem"><strong>Senses</strong> ${m.senses}${m.immune?'<br><strong>Immunities</strong> '+m.immune:''}${m.lang?'<br><strong>Languages</strong> '+m.lang:''}</p>`:''}
+        ${m.relicId?`<p style="font-size:.75rem;color:var(--gold);margin-top:.4rem;font-style:italic">💎 Can drop: ${RELICS.find(r=>r.id===m.relicId)?.name||m.relicId}</p>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRotaCard(i){
+  const card=document.getElementById('rota-'+i);
+  const was=card.classList.contains('expanded');
+  document.querySelectorAll('.rota-card').forEach(c=>{c.classList.remove('expanded');c.querySelector('.expand-hint').textContent='click to expand';});
+  if(!was){card.classList.add('expanded');card.querySelector('.expand-hint').textContent='click to collapse';}
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RELICS LIST
+// ══════════════════════════════════════════════════════════════
+function renderRelicsList(){
+  const rarityClass=r=>'rarity-'+r;
+  document.getElementById('relics-list').innerHTML=RELICS.map(rel=>`
+    <div class="relic-card" style="margin-bottom:.85rem">
+      <span class="relic-rarity ${rarityClass(rel.rarity)}">${rel.rarity.replace('-',' ')}</span>
+      <div class="relic-name">${rel.name}</div>
+      <div class="relic-type">${rel.type} · ${rel.source}</div>
+      <div class="relic-desc" style="margin-top:.5rem">${rel.desc}</div>
+      ${rel.lore?`<div class="lore-text" style="margin-top:.6rem;color:#a08040;border-color:#806020">${rel.lore}</div>`:''}
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RANDOM MONSTER BUILDER
+// ══════════════════════════════════════════════════════════════
+function buildRandMonster(cr){
+  const p=rng(RANDOM_PREFIXES),c=rng(RANDOM_CORES),s=rng(RANDOM_SUFFS);
+  const env=rng(RAND_ENVS);
+  return{
+    name:(p+' '+c+(s?' '+s:'')).trim(),
+    type:rng(RAND_SIZES)+' '+rng(RAND_TYPES),align:rng(RAND_ALIGNS),env,cr,
+    hp:rngN(Math.max(20,cr*8),Math.max(40,cr*20)),
+    ac:Math.min(22,10+Math.round(cr*0.45)),speed:rngN(3,8)*5,
+    stats:SA.map(()=>rollStat()),
+    traits:[...TRAITS_P].sort(()=>Math.random()-.5).slice(0,rngN(2,3)),
+    actions:[...ACTIONS_P].sort(()=>Math.random()-.5).slice(0,rngN(1,3)),
+    lore:null,
+    senses:rng(SENSES_P)+', passive Perception '+rngN(10,18),
+    immune:rng(IMMUNE_P),lang:rng(LANG_P),
+    tags:[],source:'random',
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+//  AI ENCOUNTER (standalone tab)
+// ══════════════════════════════════════════════════════════════
+async function generateAIEncounter(){
+  const partySize=Math.max(1,parseInt(document.getElementById('ai-party-size').value)||4);
+  const level=Math.min(20,Math.max(1,parseInt(document.getElementById('ai-party-level').value)||5));
+  const diff=document.getElementById('ai-difficulty').value;
+  const apiKey=document.getElementById('api-key-ai').value.trim();
+  if(!apiKey){alert('Please enter your Anthropic API key.');return;}
+  const cr=pickCR(level,diff);
+  const out=document.getElementById('ai-output');
+  out.innerHTML='<div class="loading-overlay"><div class="spinner"></div><span>Conjuring a creature…</span></div>';
+  try{
+    const examples=ROTA_MONSTERS.slice(0,2).map(m=>`- ${m.name} (${m.type}, CR ${m.cr})`).join('\n');
+    const prompt=`Create a D&D 5e homebrew monster for the campaign "Relics of the Ascended" at CR ${cr}.\nStyle reference:\n${examples}\nReturn ONLY valid JSON:\n{"name":"","type":"Size Type","align":"","env":"","cr":${cr},"hp":0,"ac":0,"speed":30,"stats":[10,10,10,10,10,10],"traits":[{"name":"","desc":""}],"actions":[{"name":"","desc":""}],"lore":"","senses":"darkvision 60 ft., passive Perception 12","immune":"—","lang":"—"}`;
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await resp.json();
+    const text=data.content.map(b=>b.text||'').join('');
+    const m=JSON.parse(text.replace(/```json|```/g,'').trim());
+    m.count=1;m.source='ai';
+    out.innerHTML=`<div class="slabel" style="margin-top:.5rem">AI Generated Monster — CR ${cr}</div>${buildStatBlockHTML(m)}`;
+  }catch(e){
+    out.innerHTML='<p style="color:#c0392b;font-style:italic">Generation failed. Check your API key and try again.</p>';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════════════
+function toggleKey(){
+  const inp=document.getElementById('api-key');
+  inp.type=inp.type==='password'?'text':'password';
+  event.currentTarget.textContent=inp.type==='password'?'Show':'Hide';
+}
+function toggleKey2(){
+  const inp=document.getElementById('api-key-ai');
+  inp.type=inp.type==='password'?'text':'password';
+  event.currentTarget.textContent=inp.type==='password'?'Show':'Hide';
+}
+</script>
+</body>
+</html>
