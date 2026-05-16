@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grimoire Pro — D&D Homebrew Encounter Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --parchment:#f5edd6;--parchment-dark:#e8d9b5;--parchment-deep:#d4c090;
+  --ink:#1a1209;--ink-faded:#4a3c28;--ink-light:#7a6a50;
+  --blood:#8b1a1a;--gold:#c8960c;--gold-light:#e8b84b;
+}
+body{background:#120d06;background-image:radial-gradient(ellipse at 20% 20%,#2a1f0e 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,#0f0a04 0%,transparent 60%);min-height:100vh;font-family:'Crimson Pro',Georgia,serif;color:var(--ink)}
+.page-border{position:fixed;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#8b1a1a,#c8960c,#8b1a1a,#c8960c,#8b1a1a);z-index:200}
+.container{max-width:980px;margin:0 auto;padding:2rem 1.25rem 5rem}
+/* Header */
+.site-header{text-align:center;padding:2.5rem 0 1.5rem}
+.site-header::after{content:'';display:block;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin-top:1.25rem}
+.site-title{font-family:'Cinzel',serif;font-size:clamp(1.8rem,6vw,3rem);font-weight:700;color:var(--gold-light);letter-spacing:.12em;text-shadow:0 2px 20px rgba(200,150,12,.4)}
+.site-subtitle{font-style:italic;color:#8a7355;font-size:.95rem;margin-top:.35rem;letter-spacing:.05em}
+/* Tabs */
+.tabs{display:flex;margin-bottom:1.25rem;border-radius:4px;overflow:hidden;border:1px solid #3a2a12}
+.tab{flex:1;font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.7rem .5rem;cursor:pointer;background:#1e1508;color:#7a6540;border:none;border-right:1px solid #3a2a12;transition:all .2s;text-align:center}
+.tab:last-child{border-right:none}
+.tab:hover{background:#2a1c0a;color:var(--gold-light)}
+.tab.active{background:var(--parchment);color:var(--blood);font-weight:700}
+.tab-icon{display:block;font-size:1.1rem;margin-bottom:2px}
+/* Cards */
+.card{background:var(--parchment);border-radius:3px;box-shadow:0 6px 40px rgba(0,0,0,.55);border:1px solid var(--parchment-deep);margin-bottom:1.25rem;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blood),var(--gold),var(--blood))}
+.card-inner{padding:1.5rem 1.75rem}
+@media(max-width:600px){.card-inner{padding:1.1rem}}
+/* Labels */
+.slabel{font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--blood);margin-bottom:.75rem;display:flex;align-items:center;gap:.6rem}
+.slabel::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--parchment-deep),transparent)}
+/* Fields */
+.party-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem;margin-bottom:1rem}
+@media(max-width:520px){.party-grid{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faded);margin-bottom:.35rem}
+.field input,.field select{width:100%;background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:2px;padding:.45rem .65rem;font-family:'Crimson Pro',serif;font-size:1.05rem;color:var(--ink);outline:none;transition:border-color .2s;appearance:none}
+.field input:focus,.field select:focus{border-color:var(--gold)}
+.field textarea{width:100%;background:var(--parchment);border:1px solid var(--parchment-deep);border-radius:2px;padding:.4rem .65rem;font-family:'Crimson Pro',serif;font-size:.9rem;color:var(--ink);outline:none;resize:vertical;transition:border-color .2s}
+.field textarea:focus{border-color:var(--gold)}
+/* Buttons */
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap}
+.btn{font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border:none;border-radius:2px;padding:.6rem 1.3rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-primary{background:var(--blood);color:var(--parchment);box-shadow:0 2px 12px rgba(139,26,26,.4)}
+.btn-primary:hover{background:#a01f1f;transform:translateY(-1px)}
+.btn-primary:active{transform:none}
+.btn-ghost{background:transparent;color:var(--ink-faded);border:1px solid var(--parchment-deep)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--ink)}
+.btn-danger{background:transparent;color:#a01f1f;border:1px solid #c9a0a0}
+.btn-danger:hover{background:#a01f1f;color:var(--parchment)}
+.btn-sm{padding:.35rem .8rem;font-size:.6rem}
+/* Stat blocks */
+.stat-bar{background:var(--blood);color:var(--parchment);padding:.45rem 1rem;font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin:1rem -1.75rem}
+@media(max-width:600px){.stat-bar{margin:1rem -1.1rem}}
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);text-align:center;border-bottom:1px solid var(--parchment-deep);padding-bottom:.6rem;margin-bottom:.6rem;gap:2px}
+@media(max-width:420px){.stats-row{grid-template-columns:repeat(3,1fr)}}
+.stat-col .sa{font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;color:var(--blood);display:block}
+.stat-col .sn{font-size:1.15rem;font-weight:500}
+.stat-col .sm{font-size:.8rem;color:var(--ink-faded)}
+.trait-block{margin-bottom:.55rem;font-size:.95rem;line-height:1.55}
+.trait-block .tn{font-weight:500;font-style:italic}
+.trait-block .tn::after{content:'.'}
+.divider-orn{text-align:center;color:var(--gold);font-size:1rem;margin:.75rem 0;letter-spacing:.5em}
+/* Encounter summary */
+.enc-pills{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
+.pill{background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:2px;padding:.28rem .75rem;font-size:.88rem}
+.pill strong{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blood);display:block}
+.enc-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem}
+.monster-name-big{font-family:'Cinzel',serif;font-size:clamp(1.1rem,3vw,1.6rem);font-weight:700;color:var(--ink);line-height:1.1}
+.monster-meta-line{font-style:italic;color:var(--ink-faded);font-size:.88rem;margin-top:.2rem}
+.diff-badge{font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .9rem;border-radius:2px;white-space:nowrap;flex-shrink:0}
+.d-easy{background:#1e4011;color:#7ed957}.d-medium{background:#3d4a0d;color:#cde850}.d-hard{background:#4a2e0a;color:#e8a050}.d-deadly{background:#4a0e0e;color:#e86060}
+.xp-track{height:7px;background:var(--parchment-deep);border-radius:2px;overflow:hidden;margin:.4rem 0 .2rem}
+.xp-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.xp-labels{display:flex;justify-content:space-between;font-size:.65rem;color:var(--ink-light);font-family:'Cinzel',serif;letter-spacing:.04em}
+.lore-text{font-style:italic;font-size:1rem;color:var(--ink-faded);line-height:1.7;border-left:3px solid var(--gold);padding-left:.9rem;margin:1rem 0}
+/* ── Multi-monster encounter ── */
+.monster-tabs{display:flex;gap:0;border-bottom:2px solid var(--parchment-deep);margin-bottom:1.1rem;overflow-x:auto}
+.mtab{font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.5rem 1rem;cursor:pointer;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--ink-faded);transition:all .15s;white-space:nowrap;margin-bottom:-2px}
+.mtab:hover{color:var(--ink)}
+.mtab.active{border-bottom-color:var(--blood);color:var(--blood)}
+.mtab .mtab-count{display:inline-block;background:var(--parchment-deep);border-radius:10px;font-size:.5rem;padding:1px 5px;margin-left:4px;vertical-align:middle}
+.mtab.active .mtab-count{background:var(--blood);color:var(--parchment)}
+/* Encounter group header */
+.group-banner{background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:2px;padding:.5rem .9rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.group-tag{font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;background:var(--blood);color:var(--parchment);padding:2px 8px;border-radius:2px}
+/* Conditions */
+.cond-chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.85rem}
+.chip{display:flex;align-items:center;gap:5px;border:1px solid var(--parchment-deep);border-radius:2px;padding:.28rem .8rem;font-size:.88rem;cursor:pointer;background:var(--parchment-dark);transition:all .15s;user-select:none}
+.chip:hover{border-color:var(--gold)}
+.chip.active{background:var(--ink);color:var(--parchment);border-color:var(--ink)}
+.chip .pip{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.chip .auto-tag{font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.05em;background:var(--gold);color:var(--ink);padding:1px 4px;border-radius:1px;text-transform:uppercase;margin-left:2px}
+.chip.active .auto-tag{background:var(--gold-light)}
+.eff-list{list-style:none}
+.eff-list li{padding:.3rem 0;border-bottom:1px solid var(--parchment-deep);font-size:.9rem;display:flex;align-items:baseline;gap:.5rem}
+.eff-list li:last-child{border-bottom:none}
+.eff-cat{font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;color:var(--blood);text-transform:uppercase;flex-shrink:0;min-width:72px}
+/* Monster manager */
+.monster-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;max-height:320px;overflow-y:auto}
+.monster-row{display:flex;align-items:center;gap:.6rem;background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:2px;padding:.5rem .75rem;flex-wrap:wrap}
+.mr-info{flex:1;min-width:0}
+.mr-name{font-weight:500;font-size:.95rem}
+.mr-meta{font-size:.78rem;color:var(--ink-faded);font-style:italic}
+.mr-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.mr-tag{font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;background:var(--blood);color:var(--parchment);padding:1px 6px;border-radius:2px}
+.mr-btns{display:flex;gap:.4rem;flex-shrink:0}
+.empty-state{text-align:center;padding:2rem;color:var(--ink-faded);font-style:italic;font-size:.95rem}
+/* Monster form */
+.monster-form{background:var(--parchment-dark);border:1px solid var(--parchment-deep);border-radius:3px;padding:1rem 1.1rem;margin-top:.85rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr}}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-bottom:.6rem}
+@media(max-width:520px){.form-grid-3{grid-template-columns:1fr 1fr}}
+/* Tags input */
+.tags-input-wrap{display:flex;gap:.4rem;align-items:center}
+.tags-input-wrap input{flex:1}
+.tag-pill{display:inline-flex;align-items:center;gap:4px;font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;background:var(--blood);color:var(--parchment);padding:2px 8px 2px 10px;border-radius:2px;cursor:pointer}
+.tag-pill:hover{background:#a01f1f}
+.tags-preview{display:flex;flex-wrap:wrap;gap:4px;margin-top:.4rem;min-height:22px}
+/* API */
+.api-key-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem}
+.api-note{font-size:.82rem;color:var(--ink-faded);font-style:italic}
+/* Loading */
+.loading-overlay{display:flex;align-items:center;justify-content:center;gap:.6rem;padding:1.5rem;font-style:italic;color:var(--ink-faded)}
+.spinner{width:20px;height:20px;border:2px solid var(--parchment-deep);border-top-color:var(--blood);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.anim{animation:fadeUp .3s ease both}
+.hidden{display:none!important}
+.auto-banner{background:#2a1c0a;border:1px solid #5a3a10;border-radius:2px;padding:.5rem .85rem;font-size:.85rem;color:#d4a050;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="page-border"></div>
+<div class="container">
+
+<header class="site-header">
+  <div class="site-title">⚔ Grimoire Pro ⚔</div>
+  <div class="site-subtitle">Homebrew Monster &amp; Encounter Generator — Bestiary, Tags &amp; AI</div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="setMode('random')" id="tab-random"><span class="tab-icon">🎲</span>Random</button>
+  <button class="tab" onclick="setMode('homebrew')" id="tab-homebrew"><span class="tab-icon">📖</span>My Monsters</button>
+  <button class="tab" onclick="setMode('hybrid')" id="tab-hybrid"><span class="tab-icon">✨</span>My Monsters + AI</button>
+</div>
+
+<!-- PARTY CONFIG -->
+<div class="card anim">
+  <div class="card-inner">
+    <div class="slabel">Party Configuration</div>
+    <div class="party-grid">
+      <div class="field"><label>Party Size</label><input type="number" id="party-size" value="4" min="1" max="10"></div>
+      <div class="field"><label>Average Level</label><input type="number" id="party-level" value="5" min="1" max="20"></div>
+      <div class="field"><label>Difficulty</label>
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+          <option value="deadly">Deadly</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="generateEncounter()">⚔ Generate Encounter</button>
+      <button class="btn btn-ghost hidden" id="reroll-btn" onclick="generateEncounter()">↺ Reroll</button>
+    </div>
+  </div>
+</div>
+
+<!-- MY BESTIARY MANAGER -->
+<div class="card anim hidden" id="manager-card">
+  <div class="card-inner">
+    <div class="slabel">My Bestiary</div>
+    <div class="monster-list" id="monster-list-el"></div>
+    <button class="btn btn-ghost btn-sm" onclick="toggleForm()">+ Add Monster</button>
+    <div class="monster-form hidden" id="monster-form">
+      <div class="slabel" id="form-title">New Monster</div>
+      <div class="form-grid">
+        <div class="field"><label>Name</label><input type="text" id="f-name" placeholder="Grave Stalker"></div>
+        <div class="field"><label>Type (e.g. Large undead)</label><input type="text" id="f-type" placeholder="Large undead"></div>
+      </div>
+      <div class="form-grid-3">
+        <div class="field"><label>CR</label><input type="number" id="f-cr" placeholder="5" min="0" max="30" step="0.25"></div>
+        <div class="field"><label>HP</label><input type="number" id="f-hp" placeholder="90"></div>
+        <div class="field"><label>AC</label><input type="number" id="f-ac" placeholder="15"></div>
+      </div>
+      <div class="form-grid-3">
+        <div class="field"><label>STR</label><input type="number" id="f-str" placeholder="18" min="1" max="30"></div>
+        <div class="field"><label>DEX</label><input type="number" id="f-dex" placeholder="12"></div>
+        <div class="field"><label>CON</label><input type="number" id="f-con" placeholder="16"></div>
+        <div class="field"><label>INT</label><input type="number" id="f-int" placeholder="8"></div>
+        <div class="field"><label>WIS</label><input type="number" id="f-wis" placeholder="10"></div>
+        <div class="field"><label>CHA</label><input type="number" id="f-cha" placeholder="6"></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Speed (ft)</label><input type="number" id="f-speed" placeholder="30"></div>
+        <div class="field">
+          <label>Tags (press Enter to add)</label>
+          <div class="tags-input-wrap">
+            <input type="text" id="f-tag-input" placeholder="undead, forest, boss…" onkeydown="handleTagKey(event)">
+            <button class="btn btn-ghost btn-sm" onclick="addTag()">Add</button>
+          </div>
+          <div class="tags-preview" id="tags-preview"></div>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:.6rem"><label>Traits (Name — Description, one per line)</label>
+        <textarea id="f-traits" rows="3" placeholder="Regeneration — Regains 10 HP at turn start.&#10;Pack Tactics — Advantage when ally is adjacent."></textarea>
+      </div>
+      <div class="field" style="margin-bottom:.6rem"><label>Actions (Name — Description, one per line)</label>
+        <textarea id="f-actions" rows="3" placeholder="Crushing Claw — Melee +6, 2d8+4 bludgeoning."></textarea>
+      </div>
+      <div class="field" style="margin-bottom:.85rem"><label>Lore (optional)</label>
+        <textarea id="f-lore" rows="2" placeholder="An ancient evil lurking in…"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="saveMonster()">Save Monster</button>
+        <button class="btn btn-ghost btn-sm" onclick="cancelForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API KEY -->
+<div class="card anim hidden" id="api-card">
+  <div class="card-inner">
+    <div class="slabel">Anthropic API Key</div>
+    <div class="api-key-row">
+      <div class="field" style="flex:1;margin:0"><input type="password" id="api-key" placeholder="sk-ant-…"></div>
+      <button class="btn btn-ghost btn-sm" onclick="toggleKey()">Show</button>
+    </div>
+    <p class="api-note">Stored only in this tab. Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--gold)">console.anthropic.com</a></p>
+  </div>
+</div>
+
+<!-- ENCOUNTER OUTPUT -->
+<div id="encounter-section" class="hidden">
+
+  <!-- Summary card -->
+  <div class="card anim">
+    <div class="card-inner">
+      <div id="loading-ai" class="loading-overlay hidden"><div class="spinner"></div><span>The AI is conjuring creatures from the abyss…</span></div>
+      <div id="encounter-summary">
+        <div class="enc-header">
+          <div><div class="monster-name-big" id="enc-title">—</div><div class="monster-meta-line" id="enc-subtitle">—</div></div>
+          <div class="diff-badge" id="diff-badge">Medium</div>
+        </div>
+        <div class="enc-pills" id="enc-pills"></div>
+        <div class="slabel">XP Budget</div>
+        <div class="xp-track"><div class="xp-fill" id="xp-bar"></div></div>
+        <div class="xp-labels"><span>Easy</span><span>Medium</span><span>Hard</span><span>Deadly</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat blocks with tabs if multiple monsters -->
+  <div class="card anim" id="statblock-card">
+    <div class="card-inner">
+      <div class="slabel">Stat Blocks</div>
+      <div class="group-banner" id="group-banner" style="display:none">
+        <span id="group-label" style="font-size:.9rem;font-style:italic;color:var(--ink-faded)"></span>
+        <span class="group-tag" id="group-tag-el"></span>
+      </div>
+      <div class="monster-tabs" id="monster-tabs"></div>
+      <div id="statblock-content"></div>
+    </div>
+  </div>
+
+  <!-- Conditions -->
+  <div class="card anim">
+    <div class="card-inner">
+      <div class="slabel">Conditions &amp; Variations</div>
+      <div class="auto-banner hidden" id="auto-banner">
+        ⚄ A condition was automatically applied (30% chance on each encounter).
+      </div>
+      <div class="cond-chips" id="variation-chips"></div>
+      <div id="effects-wrapper" style="display:none">
+        <div class="slabel" style="margin-top:.75rem">Active Effects</div>
+        <ul class="eff-list" id="effects-list"></ul>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /encounter-section -->
+</div><!-- /container -->
+
+<script>
+// ══════════════════════════════════════════
+//  D&D DATA
+// ══════════════════════════════════════════
+const XP_THRESH={1:[25,50,75,100],2:[50,100,150,200],3:[75,150,225,400],4:[125,250,375,500],5:[250,500,750,1100],6:[300,600,900,1400],7:[350,750,1100,1700],8:[450,900,1400,2100],9:[550,1100,1600,2400],10:[600,1200,1900,2800],11:[800,1600,2400,3600],12:[1000,2000,3000,4500],13:[1100,2200,3400,5100],14:[1250,2500,3800,5700],15:[1400,2800,4300,6400],16:[1600,3200,4800,7200],17:[2000,3900,5900,8800],18:[2100,4200,6300,9500],19:[2400,4900,7300,10900],20:[2800,5700,8500,12700]};
+const CR_XP={0:10,.125:25,.25:50,.5:100,1:200,2:450,3:700,4:1100,5:1800,6:2300,7:2900,8:3900,9:5000,10:5900,11:7200,12:8400,13:10000,14:11500,15:13000,16:15000,17:18000,18:20000,19:22000,20:25000,21:33000,22:41000,23:50000,24:62000,25:75000};
+const CRS=Object.keys(CR_XP).map(Number);
+const ENC_MULT=[[1,1],[2,1.5],[3,2],[7,2.5],[11,3],[15,4]];
+const SA=["STR","DEX","CON","INT","WIS","CHA"];
+const mod=v=>{const m=Math.floor((v-10)/2);return(m>=0?"+":"")+m};
+const rng=a=>a[Math.floor(Math.random()*a.length)];
+const rngN=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const rollStat=()=>{let d=[rngN(1,6),rngN(1,6),rngN(1,6),rngN(1,6)].sort((a,b)=>b-a);d.pop();return d.reduce((a,b)=>a+b,0)};
+const fmtXP=n=>n.toLocaleString();
+
+const PREFIXES=["Grave","Ash","Void","Fang","Iron","Tide","Storm","Ember","Blight","Frost","Shadow","Bone","Plague","Rot","Night","Cinder","Dread","Rune","Hex","Grim","Mire","Silt","Rust","Dusk","Vex"];
+const CORES=["Stalker","Crawler","Wraith","Hulk","Reaper","Walker","Weaver","Lurker","Drake","Render","Shade","Specter","Brute","Horror","Ravager","Slayer","Haunt","Warden","Fiend","Lurcher"];
+const SUFFS=["","","","","of Chaos","the Undying","Prime","Ancient","Ascendant","of the Deep","of the Abyss","Reborn","the Cursed"];
+const TYPES=["aberration","beast","construct","dragon","elemental","fey","fiend","giant","humanoid","monstrosity","ooze","plant","undead"];
+const SIZES=["Tiny","Small","Medium","Large","Huge","Gargantuan"];
+const ALIGNS=["chaotic evil","neutral evil","lawful evil","chaotic neutral","true neutral","unaligned"];
+const ENVS=["deep forest","volcanic caverns","sunken ruins","the Shadowfell","a haunted swamp","arctic tundra","the Astral Plane","desert tombs","an abandoned fortress","the ocean depths"];
+const TRAITS_P=[
+  {name:"Regeneration",desc:"Regains 10 HP at the start of its turn if it has at least 1 HP."},
+  {name:"Pack Tactics",desc:"Advantage on attack rolls while an ally is adjacent to the target."},
+  {name:"Magic Resistance",desc:"Advantage on saving throws against spells and magical effects."},
+  {name:"Keen Senses",desc:"Advantage on Perception checks relying on sight and smell."},
+  {name:"Frightful Presence",desc:"Creatures within 30 ft. must succeed DC 13 Wisdom save or be frightened for 1 minute."},
+  {name:"Legendary Resistance (1/Day)",desc:"If the creature fails a saving throw, it can choose to succeed instead."},
+  {name:"Arcane Absorption",desc:"When subjected to magical damage, regains HP equal to half the damage dealt."},
+  {name:"Ethereal Jaunt",desc:"As a bonus action, shift between the Material and Ethereal Planes."},
+  {name:"Death Burst",desc:"On death, explodes in a 10 ft. radius — DC 13 Dex. save or 3d6 necrotic."},
+  {name:"Spider Climb",desc:"Can climb difficult surfaces including ceilings without an ability check."},
+  {name:"Immutable Form",desc:"Immune to any spell or effect that would alter its form."},
+  {name:"Amphibious",desc:"Can breathe both air and water."},
+];
+const ACTIONS_P=[
+  {name:"Crushing Claw",desc:"Melee +6 to hit, reach 5 ft. Hit: 2d8+4 bludgeoning."},
+  {name:"Necrotic Breath",desc:"Recharge 5–6. 30 ft. cone, DC 14 Con. — 4d8 necrotic (half on save)."},
+  {name:"Venom Bite",desc:"Melee +5 to hit. Hit: 1d10+3 piercing + 2d6 poison, DC 13 Con. or poisoned 1 min."},
+  {name:"Mind Spike",desc:"Ranged spell +7, 60 ft. Hit: 3d6 psychic; DC 15 Wis. or stunned 1 turn."},
+  {name:"Tail Sweep",desc:"DC 14 Dex. save for all in 10 ft. — 2d6+3 bludgeoning and knocked prone."},
+  {name:"Void Tendrils",desc:"Recharge 6. 3 targets in 60 ft. DC 13 Dex. or restrained and 1d8 necrotic/turn."},
+  {name:"Shadow Step",desc:"Teleport 60 ft. to dim light or darkness, then make one melee attack with advantage."},
+  {name:"Soul Drain",desc:"Melee or ranged +6, 30 ft. Hit: 3d6 necrotic; target's HP max reduced until long rest."},
+  {name:"Glacial Bolt",desc:"Ranged +5, 90 ft. Hit: 2d10+3 cold; target speed −10 ft. until your next turn."},
+  {name:"Spore Cloud",desc:"Recharge 5–6. 15 ft. radius, DC 12 Con. or poisoned 1 minute."},
+];
+const SENSES_P=["darkvision 60 ft.","darkvision 120 ft.","tremorsense 30 ft.","blindsight 30 ft.","truesight 30 ft.","darkvision 60 ft., tremorsense 10 ft."];
+const IMMUNE_P=["poison, psychic","fire, cold","bludgeoning from nonmagical attacks","necrotic, poison","charmed, frightened","exhaustion, poisoned"];
+const LANG_P=["Abyssal","Deep Speech, telepathy 60 ft.","Sylvan, Elvish","Infernal, Common","understands Common but cannot speak","—","Primordial, telepathy 30 ft."];
+const LORES=[
+  (n,e)=>`Legends speak of the ${n} haunting ${e}, its hunger unending and its mercy nonexistent.`,
+  (n,e)=>`Scholars believe the ${n} was born from a catastrophic planar rift near ${e}.`,
+  (n,e)=>`Survivors who fled ${e} describe the ${n} as an omen of ruin — silence always follows.`,
+  (n,e)=>`The ${n} stalks ${e} during the new moon, leaving no trace but cold certainty.`,
+  (n,e)=>`Ancient texts from ${e} describe the ${n} as a servant of forgotten gods.`,
+];
+
+const VARIATIONS=[
+  {id:"broken-arm",label:"Broken Arm",color:"#c0392b",effects:[["Attack","−2 to all melee attack rolls"],["Multiattack","Loses one attack if using Multiattack"],["Athletics","Disadvantage on Strength (Athletics) checks"]]},
+  {id:"sick",label:"Sick",color:"#27ae60",effects:[["CON saves","−2 to Constitution saving throws"],["Speed","Speed reduced by 10 ft."],["Actions","DC 10 Con. save at turn start or lose 1 action"]]},
+  {id:"stronger",label:"Stronger",color:"#2980b9",effects:[["STR","+4 to STR score"],["Damage","+2 to all melee damage rolls"],["HP","Maximum HP +20"],["CR","CR raised by 1"]]},
+  {id:"under-influence",label:"Under Influence",color:"#d68910",effects:[["Attacks","All attacks at disadvantage"],["Saves","All saving throws at disadvantage"],["Movement","50% chance to move randomly each turn"],["Reactions","Cannot take reactions"]]},
+  {id:"enraged",label:"Enraged",color:"#922b21",effects:[["Attacks","Advantage on all melee attacks"],["Damage","+3 damage below half HP"],["Tactics","Cannot Dodge or Disengage"],["Movement","Ignores difficult terrain"]]},
+  {id:"ancient",label:"Ancient",color:"#6c3483",effects:[["Saves","+2 to all saving throws"],["Resistance","Legendary Resistance (1/day) if absent"],["Save DCs","All DCs +2"],["Immunity","Immune to frightened"]]},
+  {id:"wounded",label:"Wounded",color:"#7f8c8d",effects:[["HP","Max HP −25%"],["Speed","Speed halved"],["Attacks","−1 to attack rolls"],["Tracking","Enemies track at advantage"]]},
+  {id:"cursed",label:"Cursed",color:"#4a235a",effects:[["DoT","1d4 necrotic at start of each turn"],["Social","Disadvantage on Charisma checks"],["Damage","+1d6 necrotic on attacks but 1d4 backlash"],["Healing","Cannot be magically healed until curse is lifted"]]},
+  {id:"berserk",label:"Berserk",color:"#784212",effects:[["AI","Must attack the nearest creature"],["Damage","+2 to all damage rolls"],["Abilities","Cannot concentrate"],["Immunity","Immune to charmed and frightened"]]},
+  {id:"blessed",label:"Blessed",color:"#1a5276",effects:[["Bonus","+1d4 to attacks and saves"],["Regen","Regains 5 HP at turn start"],["Defense","Advantage on death saves"],["Resistance","Immune to necrotic"]]},
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let mode='random';
+let currentEncounter=[];   // array of monster objects
+let activeVariation=null;  // single id or null
+let autoApplied=false;
+let activeMonsterIdx=0;
+let editingId=null;
+let formTags=[];
+const STORAGE_KEY='grimoire_monsters_v2';
+
+function getMyMonsters(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return[]}}
+function saveMyMonsters(a){localStorage.setItem(STORAGE_KEY,JSON.stringify(a))}
+
+// ══════════════════════════════════════════
+//  MODE
+// ══════════════════════════════════════════
+function setMode(m){
+  mode=m;
+  ['random','homebrew','hybrid'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===m));
+  document.getElementById('manager-card').classList.toggle('hidden',m==='random');
+  document.getElementById('api-card').classList.toggle('hidden',m!=='hybrid');
+  if(m!=='random') renderMonsterList();
+}
+
+// ══════════════════════════════════════════
+//  ENCOUNTER MATH
+// ══════════════════════════════════════════
+function getMult(n){for(let i=ENC_MULT.length-1;i>=0;i--)if(n>=ENC_MULT[i][0])return ENC_MULT[i][1];return 1}
+
+function pickCR(level,diff){
+  const off={easy:-2,medium:0,hard:2,deadly:4};
+  const target=Math.max(0.125,level+off[diff]);
+  const valid=CRS.filter(c=>c>=0.125&&c<=target+2);
+  const close=valid.filter(c=>c>=Math.max(0.125,target-1)&&c<=target+1);
+  return close.length?rng(close):rng(valid);
+}
+
+function actualDiff(adjXP,thresholds,partySize){
+  const [e,m,h]=thresholds.map(t=>t*partySize);
+  if(adjXP<e)return'easy';if(adjXP<m)return'medium';if(adjXP<h)return'hard';return'deadly';
+}
+
+// Build a group of 1–5 monsters that fit the XP budget
+// Strategy: pick a "core" CR, then fill remaining budget with variants (×0.5–×1.5 CR)
+function buildEncounterGroup(partySize, level, diff){
+  const thresholds=XP_THRESH[level];
+  const diffIdx=["easy","medium","hard","deadly"].indexOf(diff);
+  const budget=thresholds[diffIdx]*partySize;
+
+  // How many monster types? 1–5, weighted toward 2–3
+  const typeCount=rng([1,1,2,2,2,3,3,3,4,5]);
+
+  // Pick the main CR
+  const mainCR=pickCR(level,diff);
+  const mainXP=CR_XP[mainCR]||200;
+
+  // Allocate budget: 40-70% for main, rest for minions
+  const mainShare=0.4+Math.random()*0.3;
+  const mainCount=Math.max(1,Math.round((budget*mainShare)/(mainXP*getMult(typeCount))));
+
+  const slots=[{count:Math.min(mainCount,5)}];
+  let usedXP=mainXP*slots[0].count;
+
+  // Fill remaining slots
+  for(let i=1;i<typeCount&&usedXP<budget*1.3;i++){
+    const remaining=budget-usedXP;
+    if(remaining<50) break;
+    // pick a minion CR (lower than main)
+    const minionCR=rng(CRS.filter(c=>c<=mainCR&&c>=mainCR*0.25&&c>=0.125))||0.25;
+    const minionXP=CR_XP[minionCR]||50;
+    const minionCount=Math.max(1,Math.min(5,Math.round(remaining/minionXP)));
+    if(minionCount<1) break;
+    slots.push({count:minionCount,cr:minionCR,xp:minionXP});
+    usedXP+=minionXP*minionCount;
+  }
+
+  return {slots,mainCR,mainXP,thresholds,partySize,budget,diff};
+}
+
+// ══════════════════════════════════════════
+//  RANDOM MONSTER BUILDER
+// ══════════════════════════════════════════
+function buildRandMonster(cr){
+  const p=rng(PREFIXES),c=rng(CORES),s=rng(SUFFS);
+  const env=rng(ENVS);
+  return{
+    name:(p+' '+c+(s?' '+s:'')).trim(),
+    type:rng(SIZES)+' '+rng(TYPES),
+    align:rng(ALIGNS),env,cr,
+    hp:rngN(Math.max(20,cr*8),Math.max(40,cr*20)),
+    ac:Math.min(22,10+Math.round(cr*0.45)),
+    speed:rngN(3,8)*5,
+    stats:SA.map(()=>rollStat()),
+    traits:[...TRAITS_P].sort(()=>Math.random()-.5).slice(0,rngN(2,3)),
+    actions:[...ACTIONS_P].sort(()=>Math.random()-.5).slice(0,rngN(1,3)),
+    lore:rng(LORES)(p+' '+c,env),
+    senses:rng(SENSES_P)+', passive Perception '+rngN(10,18),
+    immune:rng(IMMUNE_P),lang:rng(LANG_P),
+    tags:[],source:'random',
+  };
+}
+
+// ══════════════════════════════════════════
+//  AI MONSTER BUILDER
+// ══════════════════════════════════════════
+async function buildAIMonster(cr,myMonsters){
+  const apiKey=document.getElementById('api-key').value.trim();
+  if(!apiKey){alert('Please enter your Anthropic API key.');return null;}
+  const examples=myMonsters.slice(0,3).map(m=>`- ${m.name} (${m.type}, CR ${m.cr})`).join('\n')||'No custom examples.';
+  const prompt=`You are a D&D 5e monster designer. Create a unique homebrew monster for CR ${cr}.
+DM homebrew style reference:\n${examples}\nRespond ONLY with valid JSON, no markdown:\n{"name":"...","type":"Size Type","align":"...","env":"...","cr":${cr},"hp":0,"ac":0,"speed":30,"stats":[10,10,10,10,10,10],"traits":[{"name":"...","desc":"..."}],"actions":[{"name":"...","desc":"..."}],"lore":"...","senses":"darkvision 60 ft., passive Perception 12","immune":"—","lang":"—","tags":[],"source":"ai"}`;
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+  const data=await resp.json();
+  const text=data.content.map(b=>b.text||'').join('');
+  return JSON.parse(text.replace(/```json|```/g,'').trim());
+}
+
+// ══════════════════════════════════════════
+//  30% SINGLE CONDITION ROLL
+// ══════════════════════════════════════════
+function rollAutoCondition(){
+  autoApplied=false;
+  activeVariation=null;
+  if(Math.random()<0.3){
+    activeVariation=rng(VARIATIONS).id;
+    autoApplied=true;
+  }
+}
+
+// ══════════════════════════════════════════
+//  GENERATE ENCOUNTER
+// ══════════════════════════════════════════
+async function generateEncounter(){
+  const partySize=Math.max(1,parseInt(document.getElementById('party-size').value)||4);
+  const level=Math.min(20,Math.max(1,parseInt(document.getElementById('party-level').value)||5));
+  const diff=document.getElementById('difficulty').value;
+
+  // Show section early
+  document.getElementById('encounter-section').classList.remove('hidden');
+  document.getElementById('reroll-btn').classList.remove('hidden');
+
+  if(mode==='random'){
+    const g=buildEncounterGroup(partySize,level,diff);
+    currentEncounter=[];
+    // Build each slot as a random monster
+    for(const slot of g.slots){
+      const cr=slot.cr||g.mainCR;
+      const m=buildRandMonster(cr);
+      m.count=slot.count;
+      m.monXP=CR_XP[cr]||200;
+      currentEncounter.push(m);
+    }
+    finalizeEncounter(g,partySize,level,diff);
+    return;
+  }
+
+  if(mode==='homebrew'){
+    const myM=getMyMonsters();
+    if(!myM.length){alert('Add at least one monster to your bestiary first!');return;}
+    currentEncounter=pickHomebrewGroup(myM,partySize,level,diff);
+    const totalXP=currentEncounter.reduce((s,m)=>s+m.monXP*m.count,0);
+    const totalCount=currentEncounter.reduce((s,m)=>s+m.count,0);
+    const adjXP=Math.round(totalXP*getMult(totalCount));
+    const thresholds=XP_THRESH[level];
+    const adiff=actualDiff(adjXP,thresholds,partySize);
+    currentEncounter.forEach(m=>{m.adjXP=adjXP;m.adiff=adiff;m.thresholds=thresholds;m.partySize=partySize;});
+    rollAutoCondition();
+    activeMonsterIdx=0;
+    renderEncounter(adjXP,adiff,thresholds,partySize);
+    scrollToEncounter();
+    return;
+  }
+
+  if(mode==='hybrid'){
+    const myM=getMyMonsters();
+    const g=buildEncounterGroup(partySize,level,diff);
+    document.getElementById('loading-ai').classList.remove('hidden');
+    currentEncounter=[];
+
+    for(const slot of g.slots){
+      const cr=slot.cr||g.mainCR;
+      const useAI=!myM.length||Math.random()<0.4;
+      let m;
+      if(useAI){
+        try{ m=await buildAIMonster(cr,myM); }catch(e){ m=buildRandMonster(cr); }
+        if(!m) m=buildRandMonster(cr);
+      } else {
+        const sorted=myM.slice().sort((a,b)=>Math.abs(a.cr-cr)-Math.abs(b.cr-cr));
+        m=Object.assign({},sorted[0]);
+        m.senses=m.senses||rng(SENSES_P)+', passive Perception '+rngN(10,18);
+        m.immune=m.immune||rng(IMMUNE_P);
+        m.lang=m.lang||rng(LANG_P);
+      }
+      m.count=slot.count;
+      m.monXP=CR_XP[cr]||CR_XP[Math.round(cr)]||200;
+      currentEncounter.push(m);
+    }
+
+    document.getElementById('loading-ai').classList.add('hidden');
+    finalizeEncounter(g,partySize,level,diff);
+  }
+}
+
+function pickHomebrewGroup(myM,partySize,level,diff){
+  const thresholds=XP_THRESH[level];
+  const budget=thresholds[["easy","medium","hard","deadly"].indexOf(diff)]*partySize;
+
+  // Group by tags — try to find matching tagged groups first
+  const allTags=[...new Set(myM.flatMap(m=>m.tags||[]))];
+  let pool=myM;
+  let usedTag=null;
+
+  if(allTags.length){
+    // pick a tag that has ≥1 monster
+    const tagCandidates=allTags.filter(t=>myM.filter(m=>(m.tags||[]).includes(t)).length>=1);
+    if(tagCandidates.length){
+      usedTag=rng(tagCandidates);
+      const tagged=myM.filter(m=>(m.tags||[]).includes(usedTag));
+      // Allow up to 2 monsters without the tag as "adds"
+      const adds=myM.filter(m=>!(m.tags||[]).includes(usedTag));
+      pool=[...tagged,...(adds.length?[rng(adds)]:[])]
+        .filter((v,i,a)=>a.findIndex(x=>x===v)===i); // dedupe refs
+    }
+  }
+
+  // Sort pool by CR
+  pool=[...pool].sort((a,b)=>b.cr-a.cr);
+
+  // Build group: pick 1–3 monster types from pool
+  const typeCount=Math.min(pool.length,rng([1,1,2,2,3]));
+  const picked=pool.slice(0,typeCount);
+  const result=[];
+
+  for(const m of picked){
+    const mXP=CR_XP[m.cr]||CR_XP[Math.round(m.cr)]||200;
+    const share=budget/(typeCount*mXP*2);
+    const count=Math.max(1,Math.min(5,Math.round(share)));
+    const copy=Object.assign({},m);
+    copy.count=count;
+    copy.monXP=mXP;
+    copy.senses=copy.senses||rng(SENSES_P)+', passive Perception '+rngN(10,18);
+    copy.immune=copy.immune||rng(IMMUNE_P);
+    copy.lang=copy.lang||rng(LANG_P);
+    copy._groupTag=usedTag;
+    result.push(copy);
+  }
+  return result;
+}
+
+function finalizeEncounter(g,partySize,level,diff){
+  const totalXP=currentEncounter.reduce((s,m)=>s+m.monXP*m.count,0);
+  const totalCount=currentEncounter.reduce((s,m)=>s+m.count,0);
+  const adjXP=Math.round(totalXP*getMult(totalCount));
+  const thresholds=g.thresholds||XP_THRESH[level];
+  const adiff=actualDiff(adjXP,thresholds,partySize);
+  currentEncounter.forEach(m=>{m.adjXP=adjXP;m.adiff=adiff;m.thresholds=thresholds;m.partySize=partySize;});
+  rollAutoCondition();
+  activeMonsterIdx=0;
+  renderEncounter(adjXP,adiff,thresholds,partySize);
+  scrollToEncounter();
+}
+
+function scrollToEncounter(){
+  document.getElementById('encounter-section').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ══════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════
+const DIFF_COL={easy:'#27ae60',medium:'#c8a800',hard:'#e67e22',deadly:'#c0392b'};
+const DIFF_CLS={easy:'d-easy',medium:'d-medium',hard:'d-hard',deadly:'d-deadly'};
+const DIFF_LBL={easy:'Easy',medium:'Medium',hard:'Hard',deadly:'Deadly'};
+
+function renderEncounter(adjXP,adiff,thresholds,partySize){
+  // Summary
+  const totalMonsters=currentEncounter.reduce((s,m)=>s+m.count,0);
+  const totalXP=currentEncounter.reduce((s,m)=>s+m.monXP*m.count,0);
+  const names=currentEncounter.map(m=>`${m.count > 1?m.count+'× ':''}${m.name}`).join(' + ');
+  document.getElementById('enc-title').textContent=names;
+  document.getElementById('enc-subtitle').textContent=currentEncounter.map(m=>`${m.type||'?'} — CR ${m.cr}`).join('  |  ');
+  const badge=document.getElementById('diff-badge');
+  badge.textContent=DIFF_LBL[adiff];badge.className='diff-badge '+DIFF_CLS[adiff];
+
+  // Pills
+  document.getElementById('enc-pills').innerHTML=`
+    <div class="pill"><strong>Total Monsters</strong>${totalMonsters}</div>
+    <div class="pill"><strong>Monster Types</strong>${currentEncounter.length}</div>
+    <div class="pill"><strong>Adj. XP</strong>${fmtXP(adjXP)}</div>
+    <div class="pill"><strong>Raw XP</strong>${fmtXP(totalXP)}</div>`;
+
+  const [e,med,h,d]=thresholds.map(t=>t*partySize);
+  const pct=Math.min(100,Math.round(adjXP/d*100));
+  document.getElementById('xp-bar').style.width=pct+'%';
+  document.getElementById('xp-bar').style.background=DIFF_COL[adiff];
+
+  // Group tag banner
+  const usedTag=currentEncounter[0]?._groupTag;
+  const banner=document.getElementById('group-banner');
+  if(usedTag){
+    banner.style.display='flex';
+    document.getElementById('group-label').textContent='Encounter group built around tag:';
+    document.getElementById('group-tag-el').textContent=usedTag;
+  } else {
+    banner.style.display='none';
+  }
+
+  // Monster tabs
+  renderMonsterTabs();
+  renderStatBlock(activeMonsterIdx);
+  renderVariations();
+}
+
+function renderMonsterTabs(){
+  const tabs=document.getElementById('monster-tabs');
+  if(currentEncounter.length<=1){tabs.innerHTML='';return;}
+  tabs.innerHTML=currentEncounter.map((m,i)=>`
+    <button class="mtab${i===activeMonsterIdx?' active':''}" onclick="switchMonster(${i})">
+      ${m.name}<span class="mtab-count">${m.count>1?m.count+'×':''}</span>
+    </button>`).join('');
+}
+
+function switchMonster(i){
+  activeMonsterIdx=i;
+  document.querySelectorAll('.mtab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+  renderStatBlock(i);
+}
+
+function renderStatBlock(i){
+  const m=currentEncounter[i];
+  const stats=m.stats||SA.map(()=>10);
+  const el=document.getElementById('statblock-content');
+  el.innerHTML=`
+    <div style="display:flex;align-items:baseline;gap:.75rem;margin-bottom:.5rem;flex-wrap:wrap">
+      <span style="font-family:'Cinzel',serif;font-size:1.15rem;font-weight:700">${m.name}</span>
+      ${m.count>1?`<span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--blood);letter-spacing:.1em;text-transform:uppercase">${m.count}× in this encounter</span>`:''}
+      ${(m.tags||[]).map(t=>`<span style="font-family:'Cinzel',serif;font-size:.52rem;background:var(--blood);color:var(--parchment);padding:1px 7px;border-radius:2px;letter-spacing:.06em;text-transform:uppercase">${t}</span>`).join('')}
+    </div>
+    <p style="font-size:.88rem;font-style:italic;color:var(--ink-faded);margin-bottom:.8rem">${m.type||'?'}, ${m.align||'unaligned'} — CR ${m.cr} — found in ${m.env||'unknown lands'}</p>
+    <div class="stats-row">${SA.map((s,j)=>`<div class="stat-col"><span class="sa">${s}</span><span class="sn">${stats[j]}</span><span class="sm">(${mod(stats[j])})</span></div>`).join('')}</div>
+    <p style="font-size:.9rem;margin-bottom:.75rem"><strong>AC</strong> ${m.ac} &nbsp;|&nbsp; <strong>HP</strong> ${m.hp} &nbsp;|&nbsp; <strong>Speed</strong> ${m.speed||30} ft.</p>
+    ${(m.traits||[]).map(t=>`<div class="trait-block"><span class="tn">${t.name}</span> ${t.desc}</div>`).join('')}
+    <div class="stat-bar">Actions</div>
+    <div style="margin-top:.65rem">${(m.actions||[]).map(a=>`<div class="trait-block"><span class="tn">${a.name}</span> ${a.desc}</div>`).join('')}</div>
+    <div class="divider-orn">⁕ ⁕ ⁕</div>
+    <p style="font-size:.85rem;color:var(--ink-faded)"><strong>Senses</strong> ${m.senses||'—'}<br><strong>Damage Immunities</strong> ${m.immune||'—'}<br><strong>Languages</strong> ${m.lang||'—'}</p>
+    ${m.lore?`<div class="lore-text">${m.lore}</div>`:''}
+    ${m.source==='ai'?`<p style="font-size:.75rem;color:var(--gold);font-style:italic;margin-top:.5rem">✦ Generated by AI</p>`:''}`;
+}
+
+function renderVariations(){
+  const chips=document.getElementById('variation-chips');
+  const banner=document.getElementById('auto-banner');
+  banner.classList.toggle('hidden',!autoApplied);
+
+  chips.innerHTML=VARIATIONS.map(v=>{
+    const isActive=activeVariation===v.id;
+    const isAuto=autoApplied&&activeVariation===v.id;
+    return`<div class="chip${isActive?' active':''}" onclick="toggleVariation('${v.id}')">
+      <span class="pip" style="background:${v.color}"></span>${v.label}${isAuto?`<span class="auto-tag">auto</span>`:''}
+    </div>`;
+  }).join('');
+  renderEffects();
+}
+
+function toggleVariation(id){
+  // toggle: click same → off, click different → switch
+  if(activeVariation===id){ activeVariation=null; autoApplied=false; }
+  else { activeVariation=id; autoApplied=false; }
+  renderVariations();
+}
+
+function renderEffects(){
+  const wrap=document.getElementById('effects-wrapper');
+  if(!activeVariation){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  const v=VARIATIONS.find(x=>x.id===activeVariation);
+  if(!v){wrap.style.display='none';return;}
+  document.getElementById('effects-list').innerHTML=v.effects.map(([cat,eff])=>`<li><span class="eff-cat">${cat}</span>${eff}</li>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  MONSTER MANAGER
+// ══════════════════════════════════════════
+function renderMonsterList(){
+  const monsters=getMyMonsters();
+  const el=document.getElementById('monster-list-el');
+  if(!monsters.length){el.innerHTML='<div class="empty-state">No monsters yet. Add your first homebrew creature below.</div>';return;}
+  el.innerHTML=monsters.map((m,i)=>`
+    <div class="monster-row">
+      <div class="mr-info">
+        <div class="mr-name">${m.name}</div>
+        <div class="mr-meta">${m.type} — CR ${m.cr} — ${m.hp} HP</div>
+        <div class="mr-tags">${(m.tags||[]).map(t=>`<span class="mr-tag">${t}</span>`).join('')}</div>
+      </div>
+      <div class="mr-btns">
+        <button class="btn btn-ghost btn-sm" onclick="editMonster(${i})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMonster(${i})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleForm(){
+  editingId=null;formTags=[];
+  document.getElementById('form-title').textContent='New Monster';
+  clearForm();
+  document.getElementById('monster-form').classList.toggle('hidden');
+}
+
+function clearForm(){
+  ['f-name','f-type','f-cr','f-hp','f-ac','f-str','f-dex','f-con','f-int','f-wis','f-cha','f-speed','f-traits','f-actions','f-lore','f-tag-input'].forEach(id=>document.getElementById(id).value='');
+  formTags=[];renderTagsPreview();
+}
+
+function handleTagKey(e){if(e.key==='Enter'){e.preventDefault();addTag();}}
+function addTag(){
+  const inp=document.getElementById('f-tag-input');
+  const val=inp.value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
+  if(val&&!formTags.includes(val)){formTags.push(val);}
+  inp.value='';renderTagsPreview();
+}
+function removeTag(t){formTags=formTags.filter(x=>x!==t);renderTagsPreview();}
+function renderTagsPreview(){
+  document.getElementById('tags-preview').innerHTML=formTags.map(t=>`<span class="tag-pill" onclick="removeTag('${t}')">${t} ✕</span>`).join('');
+}
+
+function editMonster(i){
+  const m=getMyMonsters()[i];
+  editingId=i;formTags=[...(m.tags||[])];
+  document.getElementById('form-title').textContent='Edit Monster';
+  document.getElementById('f-name').value=m.name||'';
+  document.getElementById('f-type').value=m.type||'';
+  document.getElementById('f-cr').value=m.cr||1;
+  document.getElementById('f-hp').value=m.hp||50;
+  document.getElementById('f-ac').value=m.ac||13;
+  ['str','dex','con','int','wis','cha'].forEach((s,i)=>document.getElementById('f-'+s).value=(m.stats&&m.stats[i])||10);
+  document.getElementById('f-speed').value=m.speed||30;
+  document.getElementById('f-traits').value=(m.traits||[]).map(t=>t.name+' — '+t.desc).join('\n');
+  document.getElementById('f-actions').value=(m.actions||[]).map(a=>a.name+' — '+a.desc).join('\n');
+  document.getElementById('f-lore').value=m.lore||'';
+  renderTagsPreview();
+  document.getElementById('monster-form').classList.remove('hidden');
+}
+
+function parseLines(raw){return raw.trim().split('\n').filter(Boolean).map(l=>{const i=l.indexOf(' — ');return i>-1?{name:l.slice(0,i).trim(),desc:l.slice(i+3).trim()}:{name:l.trim(),desc:''};});}
+
+function saveMonster(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){alert('Please enter a monster name.');return;}
+  const monster={
+    name,type:document.getElementById('f-type').value.trim()||'monstrosity',
+    cr:parseFloat(document.getElementById('f-cr').value)||1,
+    hp:parseInt(document.getElementById('f-hp').value)||50,
+    ac:parseInt(document.getElementById('f-ac').value)||13,
+    speed:parseInt(document.getElementById('f-speed').value)||30,
+    stats:['f-str','f-dex','f-con','f-int','f-wis','f-cha'].map(id=>parseInt(document.getElementById(id).value)||10),
+    traits:parseLines(document.getElementById('f-traits').value),
+    actions:parseLines(document.getElementById('f-actions').value),
+    lore:document.getElementById('f-lore').value.trim(),
+    tags:formTags,align:'unaligned',env:'unknown lands',source:'homebrew',
+  };
+  const monsters=getMyMonsters();
+  if(editingId!==null)monsters[editingId]=monster; else monsters.push(monster);
+  saveMyMonsters(monsters);
+  clearForm();editingId=null;
+  document.getElementById('monster-form').classList.add('hidden');
+  renderMonsterList();
+}
+
+function deleteMonster(i){
+  if(!confirm('Remove this monster from your bestiary?'))return;
+  const m=getMyMonsters();m.splice(i,1);saveMyMonsters(m);renderMonsterList();
+}
+
+function cancelForm(){document.getElementById('monster-form').classList.add('hidden');clearForm();editingId=null;}
+
+function toggleKey(){
+  const inp=document.getElementById('api-key');
+  const btn=event.currentTarget;
+  if(inp.type==='password'){inp.type='text';btn.textContent='Hide';}
+  else{inp.type='password';btn.textContent='Show';}
+}
+</script>
+</body>
+</html>
